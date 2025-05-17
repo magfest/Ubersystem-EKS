@@ -51,8 +51,7 @@ efs_csi_driver = aws.eks.Addon("aws-efs-csi-driver",
     pod_identity_associations=[{
         "role_arn": efs_role.arn,
         "service_account": "efs-csi-controller-sa"
-    }],
-    opts = pulumi.ResourceOptions(depends_on=[nodegroup.nodes]))
+    }])
 
 efs = aws.efs.FileSystem("Ubersystem",
     tags={

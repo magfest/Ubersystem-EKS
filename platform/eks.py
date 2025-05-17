@@ -25,6 +25,22 @@ cluster_amazon_eks_cluster_policy = aws.iam.RolePolicyAttachment("cluster_Amazon
     policy_arn="arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
     role=cluster_role.name)
 
+node_security_group = aws.ec2.SecurityGroup("allow_internet",
+    vpc_id=vpc.vpc.id,
+    egress=[{
+        "from_port": 0,
+        "to_port": 0,
+        "protocol": "-1",
+        "cidr_blocks": ["0.0.0.0/0"],
+    }],
+    ingress=[{
+        "from_port": 0,
+        "to_port": 0,
+        "protocol": "-1",
+        "self": True
+    }]
+)
+
 eks_cluster = aws.eks.Cluster("Ubersystem",
     name="Ubersystem",
     access_config={
@@ -35,7 +51,8 @@ eks_cluster = aws.eks.Cluster("Ubersystem",
     vpc_config={
         "subnet_ids": [subnet.id for subnet in vpc.private_subnets],
         "endpoint_private_access": True,
-        "endpoint_public_access": True
+        "endpoint_public_access": True,
+        "security_group_ids": [node_security_group.id]
     },
     opts = pulumi.ResourceOptions(depends_on=[cluster_amazon_eks_cluster_policy]))
 

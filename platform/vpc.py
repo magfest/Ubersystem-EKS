@@ -23,7 +23,7 @@ public_route_table = aws.ec2.RouteTable("public-route-table", vpc_id=vpc.id)
 private_route_table = aws.ec2.RouteTable("private-route-table", vpc_id=vpc.id)
 
 # Create a route to the internet gateway
-aws.ec2.Route("public-route", route_table_id=public_route_table.id, destination_cidr_block="0.0.0.0/0", gateway_id=internet_gateway.id)
+aws.ec2.Route("public-internet-route", route_table_id=public_route_table.id, destination_cidr_block="0.0.0.0/0", gateway_id=internet_gateway.id)
 
 cidr = ipaddress.IPv4Network(config.require("cidr_block"))
 subnets = cidr.subnets(prefixlen_diff=8)
@@ -67,55 +67,15 @@ endpoint_sg = aws.ec2.SecurityGroup("allow_endpoint_access",
         "cidr_blocks": ["0.0.0.0/0"]
     }])
 
-aws.ec2.VpcEndpoint("s3",
-    vpc_id=vpc.id,
-    service_name=f"com.amazonaws.{aws.get_region().id}.s3",
-    vpc_endpoint_type="Gateway",
-    route_table_ids=[private_route_table],
-    tags={
-        "Name": "S3 Gateway"
-    })
+eip = aws.ec2.Eip("nat_eip",
+    domain="vpc")
 
-aws.ec2.VpcEndpoint("ecr-api",
-    vpc_id=vpc.id,
-    service_name=f"com.amazonaws.{aws.get_region().id}.ecr.api",
-    vpc_endpoint_type="Interface",
-    private_dns_enabled=True,
-    subnet_ids=[subnet.id for subnet in private_subnets],
-    security_group_ids=[endpoint_sg,],
+nat = aws.ec2.NatGateway("nat",
+    subnet_id=public_subnets[0].id,
+    allocation_id=eip.id,
     tags={
-        "Name": "ECR API Interface"
-    })
+        "Name": "Ubersystem Internet NAT"
+    }
+)
 
-aws.ec2.VpcEndpoint("ecr-dkr",
-    vpc_id=vpc.id,
-    service_name=f"com.amazonaws.{aws.get_region().id}.ecr.dkr",
-    vpc_endpoint_type="Interface",
-    private_dns_enabled=True,
-    subnet_ids=[subnet.id for subnet in private_subnets],
-    security_group_ids=[endpoint_sg,],
-    tags={
-        "Name": "ECR DKR Interface"
-    })
-
-aws.ec2.VpcEndpoint("ec2",
-    vpc_id=vpc.id,
-    service_name=f"com.amazonaws.{aws.get_region().id}.ec2",
-    vpc_endpoint_type="Interface",
-    private_dns_enabled=True,
-    subnet_ids=[subnet.id for subnet in private_subnets],
-    security_group_ids=[endpoint_sg,],
-    tags={
-        "Name": "EC2 Interface"
-    })
-
-aws.ec2.VpcEndpoint("eks",
-    vpc_id=vpc.id,
-    service_name=f"com.amazonaws.{aws.get_region().id}.eks",
-    vpc_endpoint_type="Interface",
-    private_dns_enabled=True,
-    subnet_ids=[subnet.id for subnet in private_subnets],
-    security_group_ids=[endpoint_sg,],
-    tags={
-        "Name": "EKS Interface"
-    })
+aws.ec2.Route("private-internet-route", route_table_id=private_route_table.id, destination_cidr_block="0.0.0.0/0", nat_gateway_id=nat.id)
