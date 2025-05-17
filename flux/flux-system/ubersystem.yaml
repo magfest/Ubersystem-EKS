@@ -89,7 +89,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
-        image: "ghcr.io/magfest/ubersystem:main"
+        image: "ghcr.io/magfest/magprime:main"
         ports:
         - containerPort: 80
         env:
@@ -167,7 +167,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
-        image: "ghcr.io/magfest/ubersystem:main"
+        image: "ghcr.io/magfest/magprime:main"
         args: ["celery-beat"]
         env:
         - name: "DB_CONNECTION_STRING"
@@ -227,7 +227,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
-        image: "ghcr.io/magfest/ubersystem:main"
+        image: "ghcr.io/magfest/magprime:main"
         args: ["celery-worker"]
         env:
         - name: "DB_CONNECTION_STRING"
