@@ -4,3 +4,5 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - ubersystem.yaml
+- services.yaml
+- efs.yaml
