@@ -1,0 +1,10 @@
+name: magfest-uber
+description: EKS Hosted Ubersystem for MAGFest
+runtime:
+  name: python
+  options:
+    toolchain: pip
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python

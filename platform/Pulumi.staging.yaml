@@ -1,0 +1,11 @@
+config:
+  aws:region: us-east-1
+  availability_zones:
+    - us-east-1a
+    - us-east-1b
+    - us-east-1c
+  cidr_block: 10.0.0.0/16
+  kubernetes_version: "1.32"
+  cluster_admins:
+    - arn:aws:iam::025244845726:user/mmurnane
+    - arn:aws:iam::025244845726:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_bc7aec9788925d65
