@@ -1,0 +1,130 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    app: redis
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: rabbitmq
+  selector:
+    app: rabbitmq
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uber_db
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: uber_db
+  selector:
+    app: uber_db
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: redis
+        image: "redis"
+        ports:
+        - containerPort: 6379
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: rabbitmq
+        image: "rabbitmq:alpine"
+        ports:
+        - containerPort: 5672
+        env:
+        - name: "RABBITMQ_DEFAULT_USER"
+          value: "celery"
+        - name: "RABBITMQ_DEFAULT_PASS"
+          value: "celery"
+        - name: "RABBITMQ_DEFAULT_VHOST"
+          value: "uber"
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uber_db
+  labels:
+    app: uber_db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uber_db
+  template:
+    metadata:
+      labels:
+        app: uber_db
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: uber_db
+        image: "postgres"
+        ports:
+        - containerPort: 5432
+        env:
+        - name: "POSTGRES_PASSWORD"
+          value: "uber_db"
+        - name: "POSTGRES_USER"
+          value: "uber_db"
+        - name: "POSTGRES_DB"
+          value: "uber_db"

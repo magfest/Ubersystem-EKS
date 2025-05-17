@@ -9,3 +9,4 @@ config:
   cluster_admins:
     - arn:aws:iam::025244845726:user/mmurnane
     - arn:aws:iam::025244845726:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_bc7aec9788925d65
+  wildcard_domain: "*.dev.magevent.net"

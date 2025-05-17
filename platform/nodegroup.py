@@ -3,6 +3,7 @@ import pulumi
 import pulumi_aws as aws
 import eks
 import vpc
+import nlb
 
 node_role = aws.iam.Role("node",
     name="eks-node",
@@ -55,3 +56,7 @@ nodes = aws.eks.NodeGroup("Ubersystem2",
         "id": template.id
     }
 )
+
+aws.autoscaling.Attachment("loadbalancer",
+    autoscaling_group_name=nodes.resources[0].autoscaling_groups[0].name,
+    lb_target_group_arn=nlb.target_group.arn)

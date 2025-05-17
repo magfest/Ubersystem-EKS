@@ -1,0 +1,237 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: web-uploads
+  finalizers:
+  - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 32000
+      port: 80
+      targetPort: 80
+      protocol: TCP
+      name: web
+  selector:
+    app: web
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: service-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["services", "endpoints"]
+  verbs: ["get", "watch", "list"]
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: init-api-access
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: init-api-access
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: service-reader
+  apiGroup: ""
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      volumes:
+      - name: web-uploads
+        persistentVolumeClaim:
+          claimName: web-uploads
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: web
+        image: "ghcr.io/magfest/ubersystem:main"
+        ports:
+        - containerPort: 80
+        env:
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+        - name: "uber_cherrypy_server_socket_port"
+          value: "80"
+        - name: "uber_cherrypy_server_socket_host"
+          value: "0.0.0.0"
+        - name: "uber_cherrypy_server_socket_timeout"
+          value: "1"
+        - name: "uber_cherrypy_tools_sessions_host"
+          value: "redis"
+        - name: "uber_cherrypy_tools_sessions_prefix"
+          value: "uber"
+        - name: "uber_cherrypy_tools_sessions_storage_type"
+          value: "redis"
+        - name: "uber_redis_host"
+          value: "redis"
+        - name: "uber_secret_broker_url"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
+        - name: "uber_hostname"
+          value: "localhost"
+        - name: "uber_dev_box"
+          value: "True"
+        volumeMounts:
+        - mountPath: "/app/plugins/uber/uploaded_files"
+          name: web-uploads
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-admin
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: create-admin
+        image: quay.io/curl/curl:latest
+        command: ["curl", "--fail-with-body", "http://web.default.svc.cluster.local:80/accounts/insert_test_admin"]
+      restartPolicy: Never
+  backoffLimit: 4
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: celery-beats
+  labels:
+    app: celery-beats
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-beats
+  template:
+    metadata:
+      labels:
+        app: celery-beats
+    spec:
+      volumes:
+      - name: web-uploads
+        persistentVolumeClaim:
+          claimName: web-uploads
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: celery-beats
+        image: "ghcr.io/magfest/ubersystem:main"
+        args: ["celery-beat"]
+        env:
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+        - name: "uber_cherrypy_server_socket_port"
+          value: "80"
+        - name: "uber_cherrypy_server_socket_host"
+          value: "0.0.0.0"
+        - name: "uber_cherrypy_server_socket_timeout"
+          value: "1"
+        - name: "uber_cherrypy_tools_sessions_host"
+          value: "redis"
+        - name: "uber_cherrypy_tools_sessions_prefix"
+          value: "uber"
+        - name: "uber_cherrypy_tools_sessions_storage_type"
+          value: "redis"
+        - name: "uber_redis_host"
+          value: "redis"
+        - name: "uber_secret_broker_url"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
+        - name: "uber_hostname"
+          value: "localhost"
+        - name: "uber_dev_box"
+          value: "True"
+        volumeMounts:
+        - mountPath: "/app/plugins/uber/uploaded_files"
+          name: web-uploads
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  labels:
+    app: celery-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+    spec:
+      volumes:
+      - name: web-uploads
+        persistentVolumeClaim:
+          claimName: web-uploads
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: celery-worker
+        image: "ghcr.io/magfest/ubersystem:main"
+        args: ["celery-worker"]
+        env:
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+        - name: "uber_cherrypy_server_socket_port"
+          value: "80"
+        - name: "uber_cherrypy_server_socket_host"
+          value: "0.0.0.0"
+        - name: "uber_cherrypy_server_socket_timeout"
+          value: "1"
+        - name: "uber_cherrypy_tools_sessions_host"
+          value: "redis"
+        - name: "uber_cherrypy_tools_sessions_prefix"
+          value: "uber"
+        - name: "uber_cherrypy_tools_sessions_storage_type"
+          value: "redis"
+        - name: "uber_redis_host"
+          value: "redis"
+        - name: "uber_secret_broker_url"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
+        - name: "uber_hostname"
+          value: "localhost"
+        - name: "uber_dev_box"
+          value: "True"
+        volumeMounts:
+        - mountPath: "/app/plugins/uber/uploaded_files"
+          name: web-uploads
