@@ -94,7 +94,7 @@ spec:
         - containerPort: 80
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+          value: "postgresql://uberdb:uberdb@db:5432/uberdb"
         - name: "uber_cherrypy_server_socket_port"
           value: "80"
         - name: "uber_cherrypy_server_socket_host"
@@ -165,7 +165,7 @@ spec:
         args: ["celery-beat"]
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+          value: "postgresql://uberdb:uberdb@db:5432/uberdb"
         - name: "uber_cherrypy_server_socket_port"
           value: "80"
         - name: "uber_cherrypy_server_socket_host"
@@ -219,7 +219,7 @@ spec:
         args: ["celery-worker"]
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://uber_db:uber_db@db:5432/uber_db"
+          value: "postgresql://uberdb:uberdb@db:5432/uberdb"
         - name: "uber_cherrypy_server_socket_port"
           value: "80"
         - name: "uber_cherrypy_server_socket_host"

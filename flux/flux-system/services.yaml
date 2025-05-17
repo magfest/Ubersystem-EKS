@@ -34,7 +34,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: uber_db
+  name: uberdb
   namespace: default
 spec:
   type: ClusterIP
@@ -42,9 +42,9 @@ spec:
     - port: 5432
       targetPort: 5432
       protocol: TCP
-      name: uber_db
+      name: uberdb
   selector:
-    app: uber_db
+    app: uberdb
 
 ---
 apiVersion: apps/v1
@@ -107,30 +107,30 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: uber_db
+  name: uberdb
   namespace: default
   labels:
-    app: uber_db
+    app: uberdb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: uber_db
+      app: uberdb
   template:
     metadata:
       labels:
-        app: uber_db
+        app: uberdb
     spec:
       terminationGracePeriodSeconds: 5
       containers:
-      - name: uber_db
+      - name: uberdb
         image: "postgres"
         ports:
         - containerPort: 5432
         env:
         - name: "POSTGRES_PASSWORD"
-          value: "uber_db"
+          value: "uberdb"
         - name: "POSTGRES_USER"
-          value: "uber_db"
+          value: "uberdb"
         - name: "POSTGRES_DB"
-          value: "uber_db"
+          value: "uberdb"
