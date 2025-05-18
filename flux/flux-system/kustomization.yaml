@@ -7,3 +7,4 @@ resources:
 - services.yaml
 - storage.yaml
 - ingress-nginx.yaml
+- cnpg.yaml
