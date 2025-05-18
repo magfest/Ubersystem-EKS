@@ -157,7 +157,7 @@ spec:
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://web.default.svc.cluster.local:80/accounts/insert_test_admin"]
+        command: ["curl", "--fail-with-body", "http://ubersystem-test.default.svc.cluster.local:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
 
