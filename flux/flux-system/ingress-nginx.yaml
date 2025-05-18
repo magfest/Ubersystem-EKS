@@ -32,6 +32,9 @@ spec:
   values:
     controller:
       service:
+        targetPorts:
+          http: http
+          https: http
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
