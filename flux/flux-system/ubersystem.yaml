@@ -18,7 +18,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: test.dev.magevent.net
+  name: ubersystem-test
   namespace: default
 spec:
   type: ClusterIP
@@ -44,7 +44,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: test.dev.magevent.net
+            name: ubersystem-test
             port:
               number: 80
   ingressClassName: nginx
