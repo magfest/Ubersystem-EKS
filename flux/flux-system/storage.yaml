@@ -1,0 +1,21 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0e9aa6da91bda11a9
+  directoryPerms: "700"
+
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+parameters:
+  csi.storage.k8s.io/fstype: xfs
+  type: gp3
+  encrypted: "false"
