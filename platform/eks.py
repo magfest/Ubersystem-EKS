@@ -38,6 +38,12 @@ node_security_group = aws.ec2.SecurityGroup("allow_internet",
         "to_port": 0,
         "protocol": "-1",
         "self": True
+    },
+    {
+        "from_port": 32000,
+        "to_port": 32000,
+        "protocol": "TCP",
+        "cidr_blocks": [subnet.cidr_block for subnet in vpc.public_subnets]
     }]
 )
 

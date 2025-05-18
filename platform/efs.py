@@ -61,4 +61,5 @@ efs = aws.efs.FileSystem("Ubersystem",
 for idx, subnet in enumerate(vpc.private_subnets):
     aws.efs.MountTarget(f"target-{config.require_object('availability_zones')[idx]}",
         file_system_id=efs.id,
-        subnet_id=subnet.id)
+        subnet_id=subnet.id,
+        security_groups=[efs_sg.id,])

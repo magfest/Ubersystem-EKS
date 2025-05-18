@@ -30,7 +30,10 @@ target_group = aws.lb.TargetGroup("target",
     vpc_id=vpc.vpc.id,
     name="Uber",
     port=32000,
-    protocol="HTTP"
+    protocol="HTTP",
+    health_check={
+        "path": "/devtools/health"
+    }
 )
 
 listener = aws.lb.Listener("listener",

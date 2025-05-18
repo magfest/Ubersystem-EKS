@@ -6,3 +6,4 @@ resources:
 - ubersystem.yaml
 - services.yaml
 - efs.yaml
+- ingress-nginx.yaml

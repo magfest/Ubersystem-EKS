@@ -18,18 +18,36 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: test.dev.magevent.net
   namespace: default
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-    - nodePort: 32000
-      port: 80
+    - port: 80
       targetPort: 80
       protocol: TCP
       name: web
   selector:
     app: web
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test.dev.magevent.net
+spec:
+  rules:
+  - host: test.dev.magevent.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: test.dev.magevent.net
+            port:
+              number: 80
+  ingressClassName: nginx
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

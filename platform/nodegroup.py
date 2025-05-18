@@ -1,5 +1,7 @@
 import json
 import pulumi
+import base64
+from pulumi import Output
 import pulumi_aws as aws
 import eks
 import vpc
@@ -37,9 +39,9 @@ template = aws.ec2.LaunchTemplate("Ubersystem",
     vpc_security_group_ids=[eks.node_security_group.id,]
 )
 
-nodes = aws.eks.NodeGroup("Ubersystem2",
+nodes = aws.eks.NodeGroup("Ubersystem",
     cluster_name=eks.eks_cluster.name,
-    node_group_name="Ubersystem2",
+    node_group_name="Ubersystem",
     node_role_arn=node_role.arn,
     subnet_ids=[subnet.id for subnet in vpc.private_subnets],
     scaling_config={
@@ -57,6 +59,10 @@ nodes = aws.eks.NodeGroup("Ubersystem2",
     }
 )
 
-aws.autoscaling.Attachment("loadbalancer",
-    autoscaling_group_name=nodes.resources[0].autoscaling_groups[0].name,
-    lb_target_group_arn=nlb.target_group.arn)
+def make_asg(resources):
+    for resource in resources:
+        for asg in resource.autoscaling_groups:
+            aws.autoscaling.Attachment(f"lb_{asg.name}",
+                autoscaling_group_name=asg.name,
+                lb_target_group_arn=nlb.target_group.arn)
+nodes.resources.apply(make_asg)
