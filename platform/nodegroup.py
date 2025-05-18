@@ -5,7 +5,6 @@ from pulumi import Output
 import pulumi_aws as aws
 import eks
 import vpc
-import nlb
 
 node_role = aws.iam.Role("node",
     name="eks-node",
@@ -59,10 +58,3 @@ nodes = aws.eks.NodeGroup("Ubersystem",
     }
 )
 
-def make_asg(resources):
-    for resource in resources:
-        for asg in resource.autoscaling_groups:
-            aws.autoscaling.Attachment(f"lb_{asg.name}",
-                autoscaling_group_name=asg.name,
-                lb_target_group_arn=nlb.target_group.arn)
-nodes.resources.apply(make_asg)
