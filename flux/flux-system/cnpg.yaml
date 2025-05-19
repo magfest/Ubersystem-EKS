@@ -70,6 +70,10 @@ spec:
   storage:
     size: 10Gi
     storageClass: ebs-sc
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://ubersystem-backups-staging/cnpg"
+    retentionPolicy: "30d"
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
