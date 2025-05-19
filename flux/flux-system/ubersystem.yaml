@@ -28,7 +28,7 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: ubersystem-eks
+    app: web
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -51,55 +51,30 @@ spec:
   ingressClassName: nginx
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: service-reader
-  namespace: default
-rules:
-- apiGroups: [""] # "" indicates the core API group
-  resources: ["services", "endpoints"]
-  verbs: ["get", "watch", "list"]
-
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: init-api-access
+  name: ubersystem
   namespace: default
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: read-pods
-  namespace: default
-subjects:
-- kind: ServiceAccount
-  name: init-api-access
-  apiGroup: ""
-roleRef:
-  kind: Role
-  name: service-reader
-  apiGroup: ""
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubersystem-eks
+  name: web
   namespace: default
   labels:
-    app: ubersystem-eks
+    app: web
 spec:
+  serviceAccountName: ubersystem
   replicas: 1
   selector:
     matchLabels:
-      app: ubersystem-eks
+      app: web
   template:
     metadata:
       labels:
-        app: ubersystem-eks
+        app: web
     spec:
       volumes:
       - name: web-uploads
