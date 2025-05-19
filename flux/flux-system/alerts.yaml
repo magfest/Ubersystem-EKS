@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   type: slack
-  channel: general
+  channel: devops-uber-updates
   address: https://slack.com/api/chat.postMessage
   secretRef:
     name: slack-bot-token
