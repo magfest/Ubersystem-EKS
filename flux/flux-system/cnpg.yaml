@@ -73,6 +73,8 @@ spec:
   backup:
     barmanObjectStore:
       destinationPath: "s3://ubersystem-backups-staging/cnpg"
+      s3Credentials:
+        inheritFromIAMRole: true
     retentionPolicy: "30d"
 ---
 apiVersion: postgresql.cnpg.io/v1
