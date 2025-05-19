@@ -42,6 +42,7 @@ spec:
             name: webhook-receiver
             port:
               number: 80
+  ingressClassName: nginx
 ---
 apiVersion: notification.toolkit.fluxcd.io/v1
 kind: Receiver
