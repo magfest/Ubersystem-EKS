@@ -35,6 +35,9 @@ spec:
         targetPorts:
           http: http
           https: http
+          nodePorts:
+            http: 32000
+            https: 32001
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
