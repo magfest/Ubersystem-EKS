@@ -9,4 +9,4 @@ resources:
 - storage.yaml
 - ingress-nginx.yaml
 - cnpg.yaml
-- alerts.yaml
+#- alerts.yaml
