@@ -69,3 +69,4 @@ spec:
     major: 17
   storage:
     size: 10Gi
+    storageClass: ebs-sc
