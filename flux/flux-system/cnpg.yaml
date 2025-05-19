@@ -71,19 +71,20 @@ spec:
       s3Credentials:
         inheritFromIAMRole: true
     retentionPolicy: "30d"
-  
-  bootstrap:
-    recovery:
-      source: clusterBackup
 
-  externalClusters:
-    - name: clusterBackup
-      barmanObjectStore:
-        destinationPath: "s3://ubersystem-backups-staging/cnpg-restore/cnpg/ubersystem"
-        s3Credentials:
-          inheritFromIAMRole: true
-        wal:
-          maxParallel: 8
+# Sample DB Recovery  
+#  bootstrap:
+#    recovery:
+#      source: clusterBackup
+
+#  externalClusters:
+#    - name: clusterBackup
+#      barmanObjectStore:
+#        destinationPath: "s3://ubersystem-backups-staging/cnpg"
+#        s3Credentials:
+#          inheritFromIAMRole: true
+#        wal:
+#          maxParallel: 8
   managed:
     roles:
     - name: ubersystem-eks
