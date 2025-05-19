@@ -263,7 +263,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: ubersystem-eks
-  namespace: postgres
+  namespace: default
 spec:
   name: ubersystem-eks
   owner: ubersystem-eks
