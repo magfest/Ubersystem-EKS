@@ -85,13 +85,7 @@ spec:
 #          inheritFromIAMRole: true
 #        wal:
 #          maxParallel: 8
-  managed:
-    roles:
-    - name: ubersystem-eks
-      ensure: present
-      comment: Ubersystem EKS
-      login: true
-      superuser: false
+
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler

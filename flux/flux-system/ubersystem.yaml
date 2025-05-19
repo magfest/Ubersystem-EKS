@@ -227,7 +227,7 @@ spec:
         - name: "DB_CONNECTION_STRING"
           valueFrom: 
             secretKeyRef:
-              name: postgres-ubersystem-eks
+              name: postgres-app
               key: uri
         - name: "LOG_CONFIG"
           value: "true"
