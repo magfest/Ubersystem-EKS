@@ -4,3 +4,5 @@ import nodegroup
 import addons
 import efs
 import cert
+import cnpg
+import ubersystem

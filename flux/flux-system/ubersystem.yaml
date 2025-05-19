@@ -225,7 +225,10 @@ spec:
         args: ["celery-worker"]
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://uberdb:uberdb@db:5432/uberdb"
+          valueFrom: 
+            secretKeyRef:
+              name: ubersystem-app
+              key: uri
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"

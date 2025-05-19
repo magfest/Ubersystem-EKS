@@ -49,16 +49,11 @@ spec:
         namespace: cnpg-system
       interval: 12h
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: postgres
----
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: ubersystem
-  namespace: postgres
+  name: postgres
+  namespace: default
 spec:
   description: "Ubersystem Postgres Cluster"
   instances: 3
@@ -80,11 +75,11 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
-  name: ubersystem-pool
-  namespace: postgres
+  name: postgres-pool
+  namespace: default
 spec:
   cluster:
-    name: ubersystem
+    name: postgres
   instances: 3
   type: rw
   pgbouncer:
