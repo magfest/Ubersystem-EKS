@@ -28,7 +28,7 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: web
+    app: ubersystem-eks
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -87,19 +87,19 @@ roleRef:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: ubersystem-eks
   namespace: default
   labels:
-    app: web
+    app: ubersystem-eks
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web
+      app: ubersystem-eks
   template:
     metadata:
       labels:
-        app: web
+        app: ubersystem-eks
     spec:
       volumes:
       - name: web-uploads
@@ -280,3 +280,14 @@ spec:
         volumeMounts:
         - mountPath: "/app/plugins/uber/uploaded_files"
           name: web-uploads
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: ubersystem
+  namespace: postgres
+spec:
+  name: ubersystem-eks
+  owner: app
+  cluster:
+    name: ubersystem
