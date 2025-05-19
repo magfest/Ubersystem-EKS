@@ -108,6 +108,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Backup
 metadata:
   name: postgres-backup
+  namespace: default
 spec:
   method: barmanObjectStore
   cluster:
