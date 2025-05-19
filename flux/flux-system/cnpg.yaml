@@ -79,7 +79,7 @@ spec:
   externalClusters:
     - name: clusterBackup
       barmanObjectStore:
-        destinationPath: "s3://ubersystem-backups-staging/cnpg-restore/cnpg"
+        destinationPath: "s3://ubersystem-backups-staging/cnpg-restore/cnpg/ubersystem"
         s3Credentials:
           inheritFromIAMRole: true
         wal:
