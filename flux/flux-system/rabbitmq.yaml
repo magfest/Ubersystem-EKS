@@ -1,0 +1,93 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: rabbitmq
+  selector:
+    app: rabbitmq
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: default
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: rabbitmq
+        image: "rabbitmq:alpine"
+        ports:
+        - containerPort: 5672
+        env:
+        - name: "RABBITMQ_DEFAULT_USER"
+          value: "celery"
+        - name: "RABBITMQ_DEFAULT_PASS"
+          value: "celery"
+        - name: "RABBITMQ_DEFAULT_VHOST"
+          value: "uber"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5555
+      targetPort: 5555
+      protocol: TCP
+      name: flower
+  selector:
+    app: flower
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  namespace: default
+  labels:
+    app: flower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flower
+  template:
+    metadata:
+      labels:
+        app: flower
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: flower
+        image: "mher/flower:2.0"
+        ports:
+        - containerPort: 5555
+        env:
+        - name: "CELERY_BROKER_URL"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
+        - name: "FLOWER_PORT"
+          value: "5555"

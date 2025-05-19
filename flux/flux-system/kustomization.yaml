@@ -4,7 +4,9 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - ubersystem.yaml
-- services.yaml
+- rabbitmq.yaml
+- redis.yaml
 - storage.yaml
 - ingress-nginx.yaml
 - cnpg.yaml
+- alerts.yaml
