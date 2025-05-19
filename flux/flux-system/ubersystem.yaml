@@ -227,7 +227,7 @@ spec:
         - name: "DB_CONNECTION_STRING"
           valueFrom: 
             secretKeyRef:
-              name: ubersystem-app
+              name: postgres-ubersystem-eks
               key: uri
         - name: "LOG_CONFIG"
           value: "true"
@@ -262,10 +262,10 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: ubersystem
+  name: ubersystem-eks
   namespace: postgres
 spec:
   name: ubersystem-eks
-  owner: app
+  owner: ubersystem-eks
   cluster:
     name: ubersystem
