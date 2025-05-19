@@ -70,3 +70,19 @@ spec:
   storage:
     size: 10Gi
     storageClass: ebs-sc
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: ubersystem-pool
+  namespace: postgres
+spec:
+  cluster:
+    name: ubersystem
+  instances: 3
+  type: rw
+  pgbouncer:
+    poolMode: session
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "10"
