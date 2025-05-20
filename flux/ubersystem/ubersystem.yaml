@@ -120,7 +120,7 @@ spec:
           value: "True"
         volumeMounts:
         - mountPath: "/app/plugins/uber/uploaded_files"
-          name: web-uploads
+          name: ${eventname}-uploads
 
 ---
 apiVersion: batch/v1
@@ -200,7 +200,7 @@ spec:
           value: "True"
         volumeMounts:
         - mountPath: "/app/plugins/uber/uploaded_files"
-          name: web-uploads
+          name: ${eventname}-uploads
 
 ---
 apiVersion: apps/v1
@@ -264,7 +264,7 @@ spec:
           value: "True"
         volumeMounts:
         - mountPath: "/app/plugins/uber/uploaded_files"
-          name: web-uploads
+          name: ${eventname}-uploads
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
