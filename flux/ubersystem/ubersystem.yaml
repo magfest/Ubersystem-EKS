@@ -294,6 +294,6 @@ metadata:
   namespace: default
 spec:
   name: ${eventname}
-  owner: ${eventname}
+  owner: app
   cluster:
     name: ubersystem
