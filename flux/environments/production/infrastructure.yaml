@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: Ubersystem-EKS
+  name: UbersystemEKS
 spec:
   url: https://github.com/magfest/Ubersystem-EKS.git
   interval: 1m
@@ -16,7 +16,7 @@ metadata:
 spec:
   sourceRef:
     kind: GitRepository
-    name: Ubersystem-EKS
+    name: UbersystemEKS
   path: ./flux/flux-system
   prune: true
   interval: 10m
@@ -28,7 +28,7 @@ metadata:
 spec:
   sourceRef:
     kind: GitRepository
-    name: Ubersystem-EKS
+    name: UbersystemEKS
   path: ./flux/infrastructure
   prune: true
   interval: 10m
