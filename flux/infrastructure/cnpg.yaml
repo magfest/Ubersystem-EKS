@@ -44,10 +44,10 @@ spec:
 # Sample DB Recovery  
   bootstrap:
     recovery:
-      source: clusterBackup
+      source: ubersystem
 
   externalClusters:
-    - name: clusterBackup
+    - name: ubersystem
       barmanObjectStore:
         destinationPath: "s3://ubersystem-backups-staging/cnpg"
         s3Credentials:
