@@ -36,7 +36,7 @@ spec:
     storageClass: ebs-sc
   backup:
     barmanObjectStore:
-      destinationPath: "s3://ubersystem-backups-staging/cnpg"
+      destinationPath: "s3://ubersystem-backups-staging/database"
       s3Credentials:
         inheritFromIAMRole: true
     retentionPolicy: "30d"
