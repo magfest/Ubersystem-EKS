@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: $(eventname)-redis
+  name: ${eventname}-redis
   namespace: default
 spec:
   type: ClusterIP
@@ -12,25 +12,25 @@ spec:
       protocol: TCP
       name: redis
   selector:
-    app: $(eventname)-redis
+    app: ${eventname}-redis
 
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: $(eventname)-redis
+  name: ${eventname}-redis
   namespace: default
   labels:
-    app: $(eventname)-redis
+    app: ${eventname}-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $(eventname)-redis
+      app: ${eventname}-redis
   template:
     metadata:
       labels:
-        app: $(eventname)-redis
+        app: ${eventname}-redis
     spec:
       terminationGracePeriodSeconds: 5
       containers:

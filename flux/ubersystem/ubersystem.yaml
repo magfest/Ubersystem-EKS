@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: $(eventname)-uploads
+  name: ${eventname}-uploads
   namespace: default
   finalizers:
   - kubernetes.io/pvc-protection
@@ -18,7 +18,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: $(eventname)-web
+  name: ${eventname}-web
   namespace: default
 spec:
   type: ClusterIP
@@ -28,24 +28,24 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: $(eventname)-web
+    app: ${eventname}-web
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: $(eventname)-web
+  name: ${eventname}-web
   namespace: default
 spec:
   rules:
-  - host: $(hostname)
+  - host: ${hostname}
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: $(eventname)-web
+            name: ${eventname}-web
             port:
               number: 80
   ingressClassName: nginx
@@ -61,25 +61,25 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $(eventname)-web
+  name: ${eventname}-web
   namespace: default
   labels:
-    app: $(eventname)-web
+    app: ${eventname}-web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $(eventname)-web
+      app: ${eventname}-web
   template:
     metadata:
       labels:
-        app: $(eventname)-web
+        app: ${eventname}-web
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: $(eventname)-uploads
+      - name: ${eventname}-uploads
         persistentVolumeClaim:
-          claimName: $(eventname)-uploads
+          claimName: ${eventname}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -126,7 +126,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: $(eventname)-create-admin
+  name: ${eventname}-create-admin
   namespace: default
 spec:
   ttlSecondsAfterFinished: 100
@@ -135,7 +135,7 @@ spec:
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://$(eventname)-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
+        command: ["curl", "--fail-with-body", "http://${eventname}-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
 
@@ -143,24 +143,24 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: $(eventname)-celery-beats
+  name: ${eventname}-celery-beats
   namespace: default
   labels:
-    app: $(eventname)-celery-beats
+    app: ${eventname}-celery-beats
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $(eventname)-celery-beats
+      app: ${eventname}-celery-beats
   template:
     metadata:
       labels:
-        app: $(eventname)-celery-beats
+        app: ${eventname}-celery-beats
     spec:
       volumes:
-      - name: $(eventname)-uploads
+      - name: ${eventname}-uploads
         persistentVolumeClaim:
-          claimName: $(eventname)-uploads
+          claimName: ${eventname}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -206,25 +206,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $(eventname)-celery-worker
+  name: ${eventname}-celery-worker
   namespace: default
   labels:
-    app: $(eventname)-celery-worker
+    app: ${eventname}-celery-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: $(eventname)-celery-worker
+      app: ${eventname}-celery-worker
   template:
     metadata:
       labels:
-        app: $(eventname)-celery-worker
+        app: ${eventname}-celery-worker
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: $(eventname)-uploads
+      - name: ${eventname}-uploads
         persistentVolumeClaim:
-          claimName: $(eventname)-uploads
+          claimName: ${eventname}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -269,10 +269,10 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: $(eventname)
+  name: ${eventname}
   namespace: default
 spec:
-  name: $(eventname)
-  owner: $(eventname)
+  name: ${eventname}
+  owner: ${eventname}
   cluster:
     name: ubersystem
