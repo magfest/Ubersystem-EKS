@@ -87,8 +87,6 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
@@ -99,6 +97,8 @@ spec:
             secretKeyRef:
               name: ubersystem-app
               key: username
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -174,8 +174,6 @@ spec:
         image: "ghcr.io/magfest/magprime:main"
         args: ["celery-beat"]
         env:
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
@@ -186,6 +184,8 @@ spec:
             secretKeyRef:
               name: ubersystem-app
               key: username
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -245,8 +245,6 @@ spec:
         image: "ghcr.io/magfest/magprime:main"
         args: ["celery-worker"]
         env:
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
@@ -257,6 +255,8 @@ spec:
             secretKeyRef:
               name: ubersystem-app
               key: username
+        - name: "DB_CONNECTION_STRING"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
