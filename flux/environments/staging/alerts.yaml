@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   type: slack
-  channel: devops-uber-updates
+  channel: bottesting
   address: https://slack.com/api/chat.postMessage
   secretRef:
     name: slack-bot-token
