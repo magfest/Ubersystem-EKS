@@ -88,10 +88,17 @@ spec:
         - containerPort: 80
         env:
         - name: "DB_CONNECTION_STRING"
-          valueFrom: 
+          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+        - name: "DB_PASSWORD"
+          valueFrom:
             secretKeyRef:
               name: ubersystem-app
-              key: uri
+              key: password
+        - name: "DB_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              name: ubersystem-app
+              key: username
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -168,10 +175,17 @@ spec:
         args: ["celery-beat"]
         env:
         - name: "DB_CONNECTION_STRING"
-          valueFrom: 
+          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+        - name: "DB_PASSWORD"
+          valueFrom:
             secretKeyRef:
               name: ubersystem-app
-              key: uri
+              key: password
+        - name: "DB_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              name: ubersystem-app
+              key: username
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -232,10 +246,17 @@ spec:
         args: ["celery-worker"]
         env:
         - name: "DB_CONNECTION_STRING"
-          valueFrom: 
+          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+        - name: "DB_PASSWORD"
+          valueFrom:
             secretKeyRef:
               name: ubersystem-app
-              key: uri
+              key: password
+        - name: "DB_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              name: ubersystem-app
+              key: username
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
