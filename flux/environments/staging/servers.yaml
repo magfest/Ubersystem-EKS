@@ -39,6 +39,6 @@ spec:
   postBuild:
     substitute:
       eventname: west
-      eventyear: "2026"
+      eventyear: "2025"
       environment: staging
       hostname: west.dev.magevent.net
