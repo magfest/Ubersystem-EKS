@@ -11,18 +11,25 @@ spec:
   path: ./flux/helm
   prune: true
   interval: 10m
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: cnpg
-      namespace: cnpg-system
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: ingress-nginx
-      namespace: ingress-nginx
   postBuild:
     substitute:
       cert_arn: arn:aws:acm:us-east-1:025244845726:certificate/e0565062-61c3-422f-ab5c-36c0ea9d5593
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crds
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/crds
+  prune: true
+  interval: 10m
+  postBuild:
+    substitute:
+      efs_filesystem: fs-0ed67314be0067195
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -37,7 +44,7 @@ spec:
   prune: true
   interval: 10m
   dependsOn:
-    - name: helm
+    - name: crds
   postBuild:
     substitute:
       efs_filesystem: fs-0ed67314be0067195

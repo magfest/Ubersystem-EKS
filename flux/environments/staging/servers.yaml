@@ -13,7 +13,7 @@ spec:
   interval: 1m
   targetNamespace: default
   dependsOn:
-  - name: infrastructure
+  - name: crds
   postBuild:
     substitute:
       eventname: super
@@ -33,7 +33,7 @@ spec:
   interval: 1m
   targetNamespace: default
   dependsOn:
-  - name: infrastructure
+  - name: crds
   postBuild:
     substitute:
       eventname: west
