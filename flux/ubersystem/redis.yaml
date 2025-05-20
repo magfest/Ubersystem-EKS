@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: $(eventname)-redis
+  namespace: default
 spec:
   type: ClusterIP
   ports:
@@ -18,6 +19,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: $(eventname)-redis
+  namespace: default
   labels:
     app: $(eventname)-redis
 spec:

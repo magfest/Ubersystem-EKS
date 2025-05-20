@@ -73,18 +73,18 @@ spec:
     retentionPolicy: "30d"
 
 # Sample DB Recovery  
-#  bootstrap:
-#    recovery:
-#      source: clusterBackup
+  bootstrap:
+    recovery:
+      source: clusterBackup
 
-#  externalClusters:
-#    - name: clusterBackup
-#      barmanObjectStore:
-#        destinationPath: "s3://ubersystem-backups-staging/cnpg"
-#        s3Credentials:
-#          inheritFromIAMRole: true
-#        wal:
-#          maxParallel: 8
+  externalClusters:
+    - name: clusterBackup
+      barmanObjectStore:
+        destinationPath: "s3://ubersystem-backups-staging/cnpg"
+        s3Credentials:
+          inheritFromIAMRole: true
+        wal:
+          maxParallel: 8
 
 ---
 apiVersion: postgresql.cnpg.io/v1

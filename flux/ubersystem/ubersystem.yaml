@@ -3,6 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: $(eventname)-uploads
+  namespace: default
   finalizers:
   - kubernetes.io/pvc-protection
 spec:
@@ -18,6 +19,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: $(eventname)-web
+  namespace: default
 spec:
   type: ClusterIP
   ports:
@@ -33,6 +35,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: $(eventname)-web
+  namespace: default
 spec:
   rules:
   - host: $(hostname)
@@ -52,12 +55,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: ubersystem
+  namespace: default
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: $(eventname)-web
+  namespace: default
   labels:
     app: $(eventname)-web
 spec:
@@ -85,7 +90,7 @@ spec:
         - name: "DB_CONNECTION_STRING"
           valueFrom: 
             secretKeyRef:
-              name: postgres-app
+              name: ubersystem-app
               key: uri
         - name: "LOG_CONFIG"
           value: "true"
@@ -122,6 +127,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: $(eventname)-create-admin
+  namespace: default
 spec:
   ttlSecondsAfterFinished: 100
   template:
@@ -138,6 +144,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: $(eventname)-celery-beats
+  namespace: default
   labels:
     app: $(eventname)-celery-beats
 spec:
@@ -163,7 +170,7 @@ spec:
         - name: "DB_CONNECTION_STRING"
           valueFrom: 
             secretKeyRef:
-              name: postgres-app
+              name: ubersystem-app
               key: uri
         - name: "LOG_CONFIG"
           value: "true"
@@ -200,6 +207,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: $(eventname)-celery-worker
+  namespace: default
   labels:
     app: $(eventname)-celery-worker
 spec:
@@ -225,7 +233,7 @@ spec:
         - name: "DB_CONNECTION_STRING"
           valueFrom: 
             secretKeyRef:
-              name: postgres-app
+              name: ubersystem-app
               key: uri
         - name: "LOG_CONFIG"
           value: "true"
@@ -261,6 +269,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: $(eventname)
+  namespace: default
 spec:
   name: $(eventname)
   owner: $(eventname)
