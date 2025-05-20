@@ -6,7 +6,8 @@ import nodegroup
 
 eks_pod_identity_agent = aws.eks.Addon("eks-pod-identity-agent",
     cluster_name=eks.eks_cluster.name,
-    addon_name="eks-pod-identity-agent")
+    addon_name="eks-pod-identity-agent",
+    opts = pulumi.ResourceOptions(depends_on=[eks.eks_cluster]))
 
 ebs_role = aws.iam.Role("ebs-csi",
     name = "ebs-csi",
@@ -37,4 +38,5 @@ ebs_csi_driver = aws.eks.Addon("aws-ebs-csi-driver",
     pod_identity_associations=[{
         "role_arn": ebs_role.arn,
         "service_account": "ebs-csi-controller-sa"
-    }])
+    }],
+    opts = pulumi.ResourceOptions(depends_on=[eks.eks_cluster]))
