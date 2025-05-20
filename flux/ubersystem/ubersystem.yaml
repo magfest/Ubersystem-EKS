@@ -54,7 +54,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ubersystem
+  name: ubersystem-email
   namespace: default
 
 ---
@@ -75,7 +75,7 @@ spec:
       labels:
         app: $(eventname)-web
     spec:
-      serviceAccountName: ubersystem
+      serviceAccountName: ubersystem-email
       volumes:
       - name: $(eventname)-uploads
         persistentVolumeClaim:
@@ -220,6 +220,7 @@ spec:
       labels:
         app: $(eventname)-celery-worker
     spec:
+      serviceAccountName: ubersystem-email
       volumes:
       - name: $(eventname)-uploads
         persistentVolumeClaim:

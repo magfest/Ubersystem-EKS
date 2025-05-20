@@ -56,5 +56,5 @@ aws.iam.RolePolicyAttachment("cnpg_policy",
 aws.eks.PodIdentityAssociation("cnpg_backups",
     cluster_name=eks.eks_cluster.name,
     namespace="default",
-    service_account="postgres",
+    service_account="ubersystem",
     role_arn=role.arn)
