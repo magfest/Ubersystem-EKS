@@ -25,7 +25,7 @@ metadata:
   namespace: default
 spec:
   description: "Ubersystem Postgres Cluster"
-  instances: 3
+  instances: 1
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
@@ -64,7 +64,7 @@ metadata:
 spec:
   cluster:
     name: ubersystem
-  instances: 3
+  instances: 1
   type: rw
   pgbouncer:
     poolMode: session

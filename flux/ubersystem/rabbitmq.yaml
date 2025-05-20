@@ -62,32 +62,32 @@ spec:
   selector:
     app: ${eventname}-flower
 
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ${eventname}-flower
-  namespace: default
-  labels:
-    app: ${eventname}-flower
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ${eventname}-flower
-  template:
-    metadata:
-      labels:
-        app: ${eventname}-flower
-    spec:
-      terminationGracePeriodSeconds: 5
-      containers:
-      - name: flower
-        image: "mher/flower:2.0"
-        ports:
-        - containerPort: 5555
-        env:
-        - name: "CELERY_BROKER_URL"
-          value: "amqp://celery:celery@rabbitmq:5672/uber"
-        - name: "FLOWER_PORT"
-          value: "5555"
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: ${eventname}-flower
+#  namespace: default
+#  labels:
+#    app: ${eventname}-flower
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: ${eventname}-flower
+#  template:
+#    metadata:
+#      labels:
+#        app: ${eventname}-flower
+#    spec:
+#      terminationGracePeriodSeconds: 5
+#      containers:
+#      - name: flower
+#        image: "mher/flower:2.0"
+#        ports:
+#        - containerPort: 5555
+#        env:
+#        - name: "CELERY_BROKER_URL"
+#          value: "amqp://celery:celery@rabbitmq:5672/uber"
+#        - name: "FLOWER_PORT"
+#          value: "5555"
