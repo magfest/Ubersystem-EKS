@@ -11,6 +11,9 @@ spec:
   path: ./flux/helm
   prune: true
   interval: 10m
+  postBuild:
+    substitute:
+      cert_arn: arn:aws:acm:us-east-1:025244845726:certificate/e0565062-61c3-422f-ab5c-36c0ea9d5593
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

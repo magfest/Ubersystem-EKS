@@ -41,7 +41,7 @@ spec:
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:025244845726:certificate/ce61e429-12f2-4207-8a48-147891f2ff60
+          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: ${cert_arn}
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           external-dns.alpha.kubernetes.io/hostname: "kube.dev.magevent.net."
