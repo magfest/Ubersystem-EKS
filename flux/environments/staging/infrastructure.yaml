@@ -29,3 +29,6 @@ spec:
   interval: 10m
   dependsOn:
     - name: helm
+  postBuild:
+    substitute:
+      efs_filesystem: fs-0ed67314be0067195
