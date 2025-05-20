@@ -19,7 +19,7 @@ spec:
       eventname: super
       eventyear: "2026"
       environment: staging
-      hostname: super.dev.magevent.net
+      hostname: super-test.dev.magevent.net
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -41,4 +41,4 @@ spec:
       eventname: west
       eventyear: "2025"
       environment: staging
-      hostname: west.dev.magevent.net
+      hostname: west-test.dev.magevent.net
