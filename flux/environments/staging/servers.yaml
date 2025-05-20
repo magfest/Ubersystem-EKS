@@ -17,6 +17,8 @@ spec:
   postBuild:
     substitute:
       eventname: super
+      eventyear: "2026"
+      environment: staging
       hostname: super.dev.magevent.net
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -37,4 +39,6 @@ spec:
   postBuild:
     substitute:
       eventname: west
+      eventyear: "2026"
+      environment: staging
       hostname: west.dev.magevent.net
