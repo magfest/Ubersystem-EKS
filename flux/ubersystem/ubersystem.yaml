@@ -2,8 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: web-uploads
-  namespace: default
+  name: $(eventname)-uploads
   finalizers:
   - kubernetes.io/pvc-protection
 spec:
@@ -18,8 +17,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubersystem-test
-  namespace: default
+  name: $(eventname)-web
 spec:
   type: ClusterIP
   ports:
@@ -28,24 +26,23 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: web
+    app: $(eventname)-web
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: eks.dev.magevent.net
-  namespace: default
+  name: $(eventname)-web
 spec:
   rules:
-  - host: eks.dev.magevent.net
+  - host: $(hostname)
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ubersystem-test
+            name: $(eventname)-web
             port:
               number: 80
   ingressClassName: nginx
@@ -55,31 +52,29 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: ubersystem
-  namespace: default
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
-  namespace: default
+  name: $(eventname)-web
   labels:
-    app: web
+    app: $(eventname)-web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web
+      app: $(eventname)-web
   template:
     metadata:
       labels:
-        app: web
+        app: $(eventname)-web
     spec:
       serviceAccountName: ubersystem
       volumes:
-      - name: web-uploads
+      - name: $(eventname)-uploads
         persistentVolumeClaim:
-          claimName: web-uploads
+          claimName: $(eventname)-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -126,8 +121,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: create-admin
-  namespace: default
+  name: $(eventname)-create-admin
 spec:
   ttlSecondsAfterFinished: 100
   template:
@@ -135,7 +129,7 @@ spec:
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://ubersystem-test.default.svc.cluster.local:80/accounts/insert_test_admin"]
+        command: ["curl", "--fail-with-body", "http://$(eventname)-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
 
@@ -143,24 +137,23 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: celery-beats
-  namespace: default
+  name: $(eventname)-celery-beats
   labels:
-    app: celery-beats
+    app: $(eventname)-celery-beats
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: celery-beats
+      app: $(eventname)-celery-beats
   template:
     metadata:
       labels:
-        app: celery-beats
+        app: $(eventname)-celery-beats
     spec:
       volumes:
-      - name: web-uploads
+      - name: $(eventname)-uploads
         persistentVolumeClaim:
-          claimName: web-uploads
+          claimName: $(eventname)-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -206,24 +199,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: celery-worker
-  namespace: default
+  name: $(eventname)-celery-worker
   labels:
-    app: celery-worker
+    app: $(eventname)-celery-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: celery-worker
+      app: $(eventname)-celery-worker
   template:
     metadata:
       labels:
-        app: celery-worker
+        app: $(eventname)-celery-worker
     spec:
       volumes:
-      - name: web-uploads
+      - name: $(eventname)-uploads
         persistentVolumeClaim:
-          claimName: web-uploads
+          claimName: $(eventname)-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -268,10 +260,9 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: ubersystem-eks
-  namespace: default
+  name: $(eventname)
 spec:
-  name: ubersystem-eks
-  owner: ubersystem-eks
+  name: $(eventname)
+  owner: $(eventname)
   cluster:
     name: ubersystem
