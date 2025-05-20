@@ -88,7 +88,7 @@ spec:
         - containerPort: 80
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
@@ -175,7 +175,7 @@ spec:
         args: ["celery-beat"]
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
@@ -246,7 +246,7 @@ spec:
         args: ["celery-worker"]
         env:
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:

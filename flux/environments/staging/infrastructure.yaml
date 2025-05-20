@@ -11,6 +11,15 @@ spec:
   path: ./flux/helm
   prune: true
   interval: 10m
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: cnpg
+      namespace: cnpg-system
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: ingress-nginx
+      namespace: ingress-nginx
   postBuild:
     substitute:
       cert_arn: arn:aws:acm:us-east-1:025244845726:certificate/e0565062-61c3-422f-ab5c-36c0ea9d5593
