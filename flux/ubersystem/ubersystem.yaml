@@ -59,7 +59,7 @@ metadata:
   labels:
     app: ${eventname}-web
 spec:
-  replicas: ${webreplicas:1}
+  replicas: ${webreplicas:=1}
   selector:
     matchLabels:
       app: ${eventname}-web
