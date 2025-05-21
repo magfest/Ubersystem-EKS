@@ -4,3 +4,4 @@ resources:
 - cnpg.yaml
 - storage.yaml
 - metrics.yaml
+- serviceaccount.yaml

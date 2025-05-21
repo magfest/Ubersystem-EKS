@@ -10,7 +10,7 @@ spec:
     name: flux-system
   path: ./flux/ubersystem
   prune: true
-  interval: 1m
+  interval: 10m
   targetNamespace: default
   dependsOn:
   - name: crds
@@ -33,7 +33,7 @@ spec:
     name: flux-system
   path: ./flux/ubersystem
   prune: true
-  interval: 1m
+  interval: 10m
   targetNamespace: default
   dependsOn:
   - name: crds
@@ -56,7 +56,7 @@ spec:
     name: flux-system
   path: ./flux/ubersystem
   prune: true
-  interval: 1m
+  interval: 10m
   targetNamespace: default
   dependsOn:
   - name: crds

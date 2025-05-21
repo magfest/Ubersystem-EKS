@@ -51,13 +51,6 @@ spec:
   ingressClassName: nginx
 
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ubersystem-email
-  namespace: default
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
