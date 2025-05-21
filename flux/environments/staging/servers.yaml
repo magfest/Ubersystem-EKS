@@ -21,7 +21,7 @@ spec:
       environment: staging
       hostname: super-test.dev.magevent.net
       container: ghcr.io/magfest/magprime:main
-      webreplicas: 5
+      webreplicas: "5"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
