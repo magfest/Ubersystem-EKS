@@ -20,6 +20,7 @@ spec:
       eventyear: "2026"
       environment: staging
       hostname: super-test.dev.magevent.net
+      container: ghcr.io/magfest/magprime:main
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -42,6 +43,7 @@ spec:
       eventyear: "2025"
       environment: staging
       hostname: west-test.dev.magevent.net
+      container: ghcr.io/magfest/magwest:west2025
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -64,3 +66,4 @@ spec:
       eventyear: "2025"
       environment: staging
       hostname: stock-test.dev.magevent.net
+      container: ghcr.io/magfest/magstock:stock2025
