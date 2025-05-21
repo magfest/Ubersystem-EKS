@@ -148,7 +148,6 @@ metadata:
   name: ${eventname}-create-admin
   namespace: default
 spec:
-  ttlSecondsAfterFinished: 100
   template:
     spec:
       containers:
@@ -157,6 +156,8 @@ spec:
         command: ["curl", "--fail-with-body", "http://${eventname}-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
 
 ---
 apiVersion: apps/v1
