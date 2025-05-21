@@ -86,6 +86,7 @@ spec:
             path: /devtools/health
             port: 80
         startupProbe:
+          initialDelaySeconds: 10
           httpGet:
             path: /devtools/health
             port: 80
