@@ -86,7 +86,7 @@ spec:
         image: "${container}"
         livenessProbe:
           httpGet:
-            path: /
+            path: /landing/
             port: 80
         readinessProbe:
           httpGet:
