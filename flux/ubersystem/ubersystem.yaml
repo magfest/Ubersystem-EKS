@@ -115,7 +115,7 @@ spec:
         - name: "uber_cherrypy_server_socket_host"
           value: "0.0.0.0"
         - name: "uber_cherrypy_server_thread_pool"
-          value: "1"
+          value: "10"
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
