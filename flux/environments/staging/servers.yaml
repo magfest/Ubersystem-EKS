@@ -22,6 +22,8 @@ spec:
       webreplicas: "1"
       webram: "128Mi"
       webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -45,6 +47,8 @@ spec:
       container: ghcr.io/magfest/magwest:west2025
       webram: "128Mi"
       webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -68,3 +72,5 @@ spec:
       container: ghcr.io/magfest/magstock:stock2025
       webram: "128Mi"
       webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
