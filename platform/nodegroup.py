@@ -6,6 +6,8 @@ import pulumi_aws as aws
 import eks
 import vpc
 
+config = pulumi.Config()
+
 node_role = aws.iam.Role("node",
     name="eks-node",
     assume_role_policy=json.dumps({
@@ -44,8 +46,8 @@ nodes = aws.eks.NodeGroup("Ubersystem",
     node_role_arn=node_role.arn,
     subnet_ids=[subnet.id for subnet in vpc.private_subnets],
     scaling_config={
-        "desired_size": 1,
-        "max_size": 2,
+        "desired_size": config.require_int("nodes"),
+        "max_size": config.require_int("nodes"),
         "min_size": 1,
     },
     update_config={

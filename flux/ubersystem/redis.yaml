@@ -38,3 +38,10 @@ spec:
         image: "redis"
         ports:
         - containerPort: 6379
+        resources:
+          requests:
+            memory: "128"
+            cpu: "50m"
+          limits:
+            memory: "256"
+            cpu: "200m"

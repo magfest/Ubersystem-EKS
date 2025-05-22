@@ -95,6 +95,13 @@ spec:
           httpGet:
             path: /devtools/health
             port: 80
+        resources:
+          requests:
+            memory: "512"
+            cpu: "500m"
+          limits:
+            memory: "1024"
+            cpu: "1000m"
         ports:
         - containerPort: 80
         env:
@@ -185,6 +192,13 @@ spec:
       - name: celery-beats
         image: "${container}"
         args: ["celery-beat"]
+        resources:
+          requests:
+            memory: "512"
+            cpu: "500m"
+          limits:
+            memory: "512"
+            cpu: "500m"
         env:
         - name: "DB_PASSWORD"
           valueFrom:
@@ -256,6 +270,13 @@ spec:
       - name: celery-worker
         image: "${container}"
         args: ["celery-worker"]
+        resources:
+          requests:
+            memory: "1024"
+            cpu: "1000m"
+          limits:
+            memory: "1024"
+            cpu: "1000m"
         env:
         - name: "DB_PASSWORD"
           valueFrom:
