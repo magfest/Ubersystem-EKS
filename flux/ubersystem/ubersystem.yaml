@@ -97,10 +97,10 @@ spec:
             port: 80
         resources:
           requests:
-            memory: "512"
+            memory: "512Mi"
             cpu: "500m"
           limits:
-            memory: "1024"
+            memory: "1024Mi"
             cpu: "1000m"
         ports:
         - containerPort: 80
@@ -194,10 +194,10 @@ spec:
         args: ["celery-beat"]
         resources:
           requests:
-            memory: "512"
+            memory: "512Mi"
             cpu: "500m"
           limits:
-            memory: "512"
+            memory: "512Mi"
             cpu: "500m"
         env:
         - name: "DB_PASSWORD"
@@ -272,10 +272,10 @@ spec:
         args: ["celery-worker"]
         resources:
           requests:
-            memory: "1024"
+            memory: "1024Mi"
             cpu: "1000m"
           limits:
-            memory: "1024"
+            memory: "1024Mi"
             cpu: "1000m"
         env:
         - name: "DB_PASSWORD"
