@@ -97,8 +97,8 @@ spec:
             port: 80
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: ${webram}
+            cpu: ${webcpu}
           limits:
             memory: "1024Mi"
             cpu: "1000m"

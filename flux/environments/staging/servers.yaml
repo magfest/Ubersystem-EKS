@@ -20,6 +20,8 @@ spec:
       hostname: super-test.dev.magevent.net
       container: ghcr.io/magfest/magprime:main
       webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -41,6 +43,8 @@ spec:
       environment: staging
       hostname: west-test.dev.magevent.net
       container: ghcr.io/magfest/magwest:west2025
+      webram: "128Mi"
+      webcpu: "64m"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -62,3 +66,5 @@ spec:
       environment: staging
       hostname: stock-test.dev.magevent.net
       container: ghcr.io/magfest/magstock:stock2025
+      webram: "128Mi"
+      webcpu: "64m"
