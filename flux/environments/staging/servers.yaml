@@ -12,8 +12,6 @@ spec:
   prune: true
   interval: 10m
   targetNamespace: default
-  dependsOn:
-  - name: crds
   postBuild:
     substitute:
       eventname: super
@@ -36,8 +34,6 @@ spec:
   prune: true
   interval: 10m
   targetNamespace: default
-  dependsOn:
-  - name: crds
   postBuild:
     substitute:
       eventname: west
@@ -59,8 +55,6 @@ spec:
   prune: true
   interval: 10m
   targetNamespace: default
-  dependsOn:
-  - name: crds
   postBuild:
     substitute:
       eventname: stock
