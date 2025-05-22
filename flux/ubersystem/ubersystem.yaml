@@ -78,10 +78,12 @@ spec:
       - name: web
         image: "${container}"
         livenessProbe:
+          timeoutSeconds: 5
           httpGet:
             path: /landing/
             port: 80
         readinessProbe:
+          timeoutSeconds: 4
           httpGet:
             path: /devtools/health
             port: 80
