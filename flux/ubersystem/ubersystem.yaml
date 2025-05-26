@@ -36,6 +36,8 @@ kind: Ingress
 metadata:
   name: ${eventname}-web
   namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
 spec:
   rules:
   - host: ${hostname}
