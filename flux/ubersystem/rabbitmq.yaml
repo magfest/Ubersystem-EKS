@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${eventname}-rabbitmq
-  namespace: default
+  name: rabbitmq
+  namespace: ${eventname}
 spec:
   type: ClusterIP
   ports:
@@ -12,25 +12,25 @@ spec:
       protocol: TCP
       name: rabbitmq
   selector:
-    app: ${eventname}-rabbitmq
+    app: rabbitmq
 
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ${eventname}-rabbitmq
-  namespace: default
+  name: rabbitmq
+  namespace: ${eventname}
   labels:
-    app: ${eventname}-rabbitmq
+    app: rabbitmq
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${eventname}-rabbitmq
+      app: rabbitmq
   template:
     metadata:
       labels:
-        app: ${eventname}-rabbitmq
+        app: rabbitmq
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -57,8 +57,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${eventname}-flower
-  namespace: default
+  name: flower
+  namespace: ${eventname}
 spec:
   type: ClusterIP
   ports:
@@ -67,25 +67,25 @@ spec:
       protocol: TCP
       name: flower
   selector:
-    app: ${eventname}-flower
+    app: flower
 
 #---
 #apiVersion: apps/v1
 #kind: Deployment
 #metadata:
-#  name: ${eventname}-flower
-#  namespace: default
+#  name: flower
+#  namespace: ${eventname}
 #  labels:
-#    app: ${eventname}-flower
+#    app: flower
 #spec:
 #  replicas: 1
 #  selector:
 #    matchLabels:
-#      app: ${eventname}-flower
+#      app: flower
 #  template:
 #    metadata:
 #      labels:
-#        app: ${eventname}-flower
+#        app: flower
 #    spec:
 #      terminationGracePeriodSeconds: 5
 #      containers:
