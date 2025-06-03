@@ -130,6 +130,8 @@ spec:
             secretKeyRef:
               name: database-app
               key: username
+        - name: LOG_CONFIG
+          value: "true"
         - name: "DB_CONNECTION_STRING"
           value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
         - name: "CONFIG_REPO"
@@ -158,6 +160,11 @@ spec:
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
+        - name: "UBERSYSTEM_SECRETS"
+          valueFrom:
+            secretKeyRef:
+              name: uber-secrets
+              key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploads
@@ -251,6 +258,11 @@ spec:
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
+        - name: "UBERSYSTEM_SECRETS"
+          valueFrom:
+            secretKeyRef:
+              name: uber-secrets
+              key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploads
@@ -327,6 +339,11 @@ spec:
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
+        - name: "UBERSYSTEM_SECRETS"
+          valueFrom:
+            secretKeyRef:
+              name: uber-secrets
+              key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploads
