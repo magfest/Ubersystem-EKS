@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${eventname}${eventyear}-uploads
-  namespace: default
+  name: uploads
+  namespace: ${eventname}
   finalizers:
   - kubernetes.io/pvc-protection
 spec:
@@ -18,8 +18,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${eventname}${eventyear}-web
-  namespace: default
+  name: web
+  namespace: ${eventname}
 spec:
   type: ClusterIP
   ports:
@@ -28,14 +28,14 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: ${eventname}${eventyear}-web
+    app: web
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ${eventname}${eventyear}-web
-  namespace: default
+  name: web
+  namespace: ${eventname}
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
 spec:
@@ -47,7 +47,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ${eventname}${eventyear}-web
+            name: web
             port:
               number: 80
   ingressClassName: nginx
@@ -56,25 +56,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${eventname}${eventyear}-web
-  namespace: default
+  name: web
+  namespace: ${eventname}
   labels:
-    app: ${eventname}${eventyear}-web
+    app: web
 spec:
   replicas: ${webreplicas:=1}
   selector:
     matchLabels:
-      app: ${eventname}${eventyear}-web
+      app: web
   template:
     metadata:
       labels:
-        app: ${eventname}${eventyear}-web
+        app: web
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: ${eventname}${eventyear}-uploads
+      - name: uploads
         persistentVolumeClaim:
-          claimName: ${eventname}${eventyear}-uploads
+          claimName: uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -110,15 +110,15 @@ spec:
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: password
         - name: "DB_USERNAME"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -132,36 +132,36 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "${eventname}-redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "${eventname}-redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@${eventname}-rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}${eventyear}-uploads
+          name: ${eventname}-uploads
 
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ${eventname}${eventyear}-create-admin
-  namespace: default
+  name: create-admin
+  namespace: ${eventname}
 spec:
   template:
     spec:
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://${eventname}${eventyear}-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
+        command: ["curl", "--fail-with-body", "http://web:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
   successfulJobsHistoryLimit: 0
@@ -171,24 +171,24 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ${eventname}${eventyear}-celery-beats
-  namespace: default
+  name: celery-beats
+  namespace: ${eventname}
   labels:
-    app: ${eventname}${eventyear}-celery-beats
+    app: celery-beats
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${eventname}${eventyear}-celery-beats
+      app: celery-beats
   template:
     metadata:
       labels:
-        app: ${eventname}${eventyear}-celery-beats
+        app: celery-beats
     spec:
       volumes:
-      - name: ${eventname}${eventyear}-uploads
+      - name: uploads
         persistentVolumeClaim:
-          claimName: ${eventname}${eventyear}-uploads
+          claimName: uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -205,17 +205,15 @@ spec:
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: password
         - name: "DB_USERNAME"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
-        - name: "LOG_CONFIG"
-          value: "true"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -227,46 +225,46 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}${eventyear}-uploads
+          name: uploads
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${eventname}${eventyear}-celery-worker
-  namespace: default
+  name: celery-worker
+  namespace: ${eventname}
   labels:
-    app: ${eventname}${eventyear}-celery-worker
+    app: celery-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${eventname}${eventyear}-celery-worker
+      app: celery-worker
   template:
     metadata:
       labels:
-        app: ${eventname}${eventyear}-celery-worker
+        app: celery-worker
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: ${eventname}${eventyear}-uploads
+      - name: uploads
         persistentVolumeClaim:
-          claimName: ${eventname}${eventyear}-uploads
+          claimName: uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -283,17 +281,15 @@ spec:
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: password
         - name: "DB_USERNAME"
           valueFrom:
             secretKeyRef:
-              name: ubersystem-app
+              name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
-        - name: "LOG_CONFIG"
-          value: "true"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool.default:5432/${eventname}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -305,30 +301,110 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}${eventyear}-redis"
+          value: "redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}${eventyear}-uploads
+          name: uploads
+
+### Database
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: database
+  namespace: ${eventname}
+spec:
+  description: "${eventname} Postgres Cluster"
+  instances: 1
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql
+    major: 17
+  storage:
+    size: 10Gi
+    storageClass: ebs-sc
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://${db_backup_bucket}/${eventname}"
+      s3Credentials:
+        inheritFromIAMRole: true
+    retentionPolicy: "30d"
+
+# Sample DB Recovery  
+#  bootstrap:
+#    recovery:
+#      source: ubersystem
+
+  externalClusters:
+    - name: database
+      barmanObjectStore:
+        destinationPath: "s3://${db_backup_bucket}/${eventname}"
+        s3Credentials:
+          inheritFromIAMRole: true
+        wal:
+          maxParallel: 8
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: postgres-pool
+  namespace: ${eventname}
+spec:
+  cluster:
+    name: database
+  instances: 1
+  type: rw
+  pgbouncer:
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "20"
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: database-backup
+  namespace: ${eventname}
+spec:
+  method: barmanObjectStore
+  cluster:
+    name: database
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: database-backup
+  namespace: ${eventname}
+spec:
+  schedule: "0 0 0 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: ubersystem
+
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: ${eventname}${eventyear}
-  namespace: default
+  name: ${eventname}
+  namespace: ${eventname}
 spec:
-  name: ${eventname}${eventyear}
+  name: ${eventname}
   owner: app
   cluster:
-    name: ubersystem
+    name: database
