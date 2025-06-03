@@ -42,7 +42,7 @@ spec:
       eventname: super2025
       hostname: super2025.reg.magfest.org
       container: ghcr.io/magfest/magprime:main
-      webreplicas: "0"
+      webreplicas: "1"
       webram: "128Mi"
       webcpu: "64m"
       celeryram: "128Mi"
@@ -92,7 +92,7 @@ spec:
       eventname: west2024
       hostname: west2024.reg.magfest.org
       container: ghcr.io/magfest/magwest:west2024
-      webreplicas: "0"
+      webreplicas: "1"
       webram: "128Mi"
       webcpu: "64m"
       celeryram: "128Mi"
@@ -142,7 +142,7 @@ spec:
       eventname: stock2024
       hostname: stock2024.reg.magfest.org
       container: ghcr.io/magfest/magstock:stock2024
-      webreplicas: "0"
+      webreplicas: "1"
       webram: "128Mi"
       webcpu: "64m"
       celeryram: "128Mi"
