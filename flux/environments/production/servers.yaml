@@ -1,0 +1,234 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-super2025
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: super
+      eventyear: "2025"
+      environment: production
+      hostname: super2025.reg.magfest.org
+      container: ghcr.io/magfest/magprime:main
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-west2024
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: west
+      eventyear: "2024"
+      environment: production
+      hostname: west2024.reg.magfest.org
+      container: ghcr.io/magfest/magwest:west2024
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-stock2024
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: stock
+      eventyear: "2024"
+      environment: production
+      hostname: stock2024.reg.magfest.org
+      container: ghcr.io/magfest/magstock:stock2024
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-super2024
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: super
+      eventyear: "2024"
+      environment: production
+      hostname: super2024.reg.magfest.org
+      container: ghcr.io/magfest/magprime:super2024
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-super2023
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: super
+      eventyear: "2023"
+      environment: production
+      hostname: super2023.reg.magfest.org
+      container: ghcr.io/magfest/magprime:super2023
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-stock2023
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: stock
+      eventyear: "2023"
+      environment: production
+      hostname: stock2023.reg.magfest.org
+      container: ghcr.io/magfest/magstock:stock2023
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-west2023
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: west
+      eventyear: "2023"
+      environment: production
+      hostname: west2023.reg.magfest.org
+      container: ghcr.io/magfest/magwest:west2023
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-super2022
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: super
+      eventyear: "2022"
+      environment: production
+      hostname: super2022.reg.magfest.org
+      container: ghcr.io/magfest/magprime:super2022
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-west2022
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: default
+  postBuild:
+    substitute:
+      eventname: west
+      eventyear: "2022"
+      environment: production
+      hostname: west2022.reg.magfest.org
+      container: ghcr.io/magfest/magwest:west2022
+      webreplicas: "1"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
