@@ -13,4 +13,11 @@ config:
   magfest-uber:nodes: 8
   magfest-uber:postgres_backup_bucket: ubersystem-backups-production
   magfest-uber:wildcard_domain: '*.reg.magfest.org'
+  magfest-uber:uber_instances:
+    - super2025
+    - super2026
+    - west2024
+    - west2025
+    - stock2024
+    - stock2025
 encryptionsalt: v1:BbrOHwXPVUg=:v1:YBPiGMTRdUwuYTfE:ohlVxSiYQKPvTDyp/Jx8pSfru2EqVQ==

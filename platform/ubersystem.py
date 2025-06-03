@@ -47,8 +47,9 @@ policy = aws.iam.Policy("uber-email",
         ]
     }))
 
-aws.eks.PodIdentityAssociation("uber_email",
-    cluster_name=eks.eks_cluster.name,
-    namespace="default",
-    service_account="ubersystem-email",
-    role_arn=role.arn)
+for namespace in config.require_object("uber_instances"):
+    aws.eks.PodIdentityAssociation(f"uber_email_{namespace}",
+        cluster_name=eks.eks_cluster.name,
+        namespace=namespace,
+        service_account="ubersystem-email",
+        role_arn=role.arn)
