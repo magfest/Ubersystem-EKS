@@ -10,7 +10,7 @@ config:
     - arn:aws:iam::278110951434:user/mmurnane
     - arn:aws:iam::278110951434:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_41209615d6dfa02e
   magfest-uber:kubernetes_version: "1.32"
-  magfest-uber:nodes: 5
+  magfest-uber:nodes: 8
   magfest-uber:postgres_backup_bucket: ubersystem-backups-production
   magfest-uber:wildcard_domain: '*.reg.magfest.org'
 encryptionsalt: v1:BbrOHwXPVUg=:v1:YBPiGMTRdUwuYTfE:ohlVxSiYQKPvTDyp/Jx8pSfru2EqVQ==

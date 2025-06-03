@@ -158,8 +158,6 @@ spec:
           value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
-        - name: "uber_dev_box"
-          value: "True"
         - name: "UBERSYSTEM_SECRETS"
           valueFrom:
             secretKeyRef:
@@ -256,8 +254,6 @@ spec:
           value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
-        - name: "uber_dev_box"
-          value: "True"
         - name: "UBERSYSTEM_SECRETS"
           valueFrom:
             secretKeyRef:
@@ -337,8 +333,6 @@ spec:
           value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
-        - name: "uber_dev_box"
-          value: "True"
         - name: "UBERSYSTEM_SECRETS"
           valueFrom:
             secretKeyRef:
