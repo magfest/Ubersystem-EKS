@@ -42,7 +42,7 @@ spec:
     substitute:
       eventname: super2025
       hostname: super2025.reg.magfest.org
-      container: ghcr.io/magfest/magprime:main
+      container: ghcr.io/magfest/magprime:super2025
       webreplicas: "1"
       webram: "128Mi"
       webcpu: "64m"
