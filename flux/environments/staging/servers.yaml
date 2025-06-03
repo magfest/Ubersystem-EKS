@@ -14,9 +14,7 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: super
-      eventyear: "2026"
-      environment: staging
+      eventname: super2026
       hostname: super-test.dev.magevent.net
       container: ghcr.io/magfest/magprime:main
       webreplicas: "1"
@@ -24,6 +22,7 @@ spec:
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/staging uber_config/events/super/2026/staging"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -40,15 +39,14 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: west
-      eventyear: "2025"
-      environment: staging
+      eventname: west2025
       hostname: west-test.dev.magevent.net
       container: ghcr.io/magfest/magwest:west2025
       webram: "128Mi"
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/staging uber_config/events/west/2025/staging"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -65,12 +63,11 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: stock
-      eventyear: "2025"
-      environment: staging
+      eventname: stock2025
       hostname: stock-test.dev.magevent.net
       container: ghcr.io/magfest/magstock:stock2025
       webram: "128Mi"
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/staging uber_config/events/stock/2025/staging"

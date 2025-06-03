@@ -14,9 +14,7 @@
 #  targetNamespace: default
 #  postBuild:
 #    substitute:
-#      eventname: super
-#      eventyear: "2026"
-#      environment: prod
+#      eventname: super2026
 #      hostname: super2026.reg.magfest.org
 #      container: ghcr.io/magfest/magprime:main
 #      webreplicas: "1"
@@ -24,6 +22,7 @@
 #      webcpu: "64m"
 #      celeryram: "128Mi"
 #      celerycpu: "64m"
+#      config_paths: "uber_config/environments/prod uber_config/events/super/2026"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -40,9 +39,7 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: super
-      eventyear: "2025"
-      environment: prod
+      eventname: super2025
       hostname: super2025.reg.magfest.org
       container: ghcr.io/magfest/magprime:main
       webreplicas: "1"
@@ -50,6 +47,7 @@ spec:
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/super/2025"
 #---
 #apiVersion: kustomize.toolkit.fluxcd.io/v1
 #kind: Kustomization
@@ -66,9 +64,7 @@ spec:
 #  targetNamespace: default
 #  postBuild:
 #    substitute:
-#      eventname: west
-#      eventyear: "2025"
-#      environment: prod
+#      eventname: west2025
 #      hostname: west2025.reg.magfest.org
 #      container: ghcr.io/magfest/magwest:west2025
 #      webreplicas: "1"
@@ -76,6 +72,7 @@ spec:
 #      webcpu: "64m"
 #      celeryram: "128Mi"
 #      celerycpu: "64m"
+#      config_paths: "uber_config/environments/prod uber_config/events/west/2025"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -92,9 +89,7 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: west
-      eventyear: "2024"
-      environment: prod
+      eventname: west2024
       hostname: west2024.reg.magfest.org
       container: ghcr.io/magfest/magwest:west2024
       webreplicas: "1"
@@ -102,6 +97,7 @@ spec:
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/west/2024"
 #---
 #apiVersion: kustomize.toolkit.fluxcd.io/v1
 #kind: Kustomization
@@ -118,9 +114,7 @@ spec:
 #  targetNamespace: default
 #  postBuild:
 #    substitute:
-#      eventname: stock
-#      eventyear: "2025"
-#      environment: prod
+#      eventname: stock2025
 #      hostname: stock2025.reg.magfest.org
 #      container: ghcr.io/magfest/magstock:stock2025
 #      webreplicas: "1"
@@ -128,6 +122,7 @@ spec:
 #      webcpu: "64m"
 #      celeryram: "128Mi"
 #      celerycpu: "64m"
+#      config_paths: "uber_config/environments/prod uber_config/events/stock/2025"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -144,9 +139,7 @@ spec:
   targetNamespace: default
   postBuild:
     substitute:
-      eventname: stock
-      eventyear: "2024"
-      environment: prod
+      eventname: stock2024
       hostname: stock2024.reg.magfest.org
       container: ghcr.io/magfest/magstock:stock2024
       webreplicas: "1"
@@ -154,3 +147,4 @@ spec:
       webcpu: "64m"
       celeryram: "128Mi"
       celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/stock/2024"
