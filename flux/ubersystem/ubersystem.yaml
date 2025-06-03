@@ -373,14 +373,14 @@ spec:
 #      source: ubersystem
 
 # Recover DB from RDS
-  bootstrap:
-    initdb:
-      import:
-        type: microservice
-        databases:
-          - ${eventname}
-        source:
-          externalCluster: rds
+#  bootstrap:
+#    initdb:
+#      import:
+#        type: microservice
+#        databases:
+#          - ${eventname}
+#        source:
+#          externalCluster: rds
 
   externalClusters:
     - name: database
