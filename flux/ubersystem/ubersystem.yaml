@@ -131,7 +131,7 @@ spec:
               name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -226,7 +226,7 @@ spec:
               name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -302,7 +302,7 @@ spec:
               name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -428,15 +428,3 @@ spec:
   backupOwnerReference: self
   cluster:
     name: ubersystem
-
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: ${eventname}
-  namespace: ${eventname}
-spec:
-  name: ${eventname}
-  owner: app
-  cluster:
-    name: database
