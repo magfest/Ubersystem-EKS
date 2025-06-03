@@ -7,7 +7,7 @@ on:
 jobs:
   update_staging:
     environment: staging
-    name: Update
+    name: Update Staging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: pip install -r requirements.txt
+      - run: pip install -r platform/requirements.txt
       - uses: pulumi/actions@v6
         with:
           command: up
@@ -36,7 +36,7 @@ on:
 jobs:
   update_production:
     environment: production
-    name: Update
+    name: Update Production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: pip install -r requirements.txt
+      - run: pip install -r platform/requirements.txt
       - uses: pulumi/actions@v6
         with:
           command: up
