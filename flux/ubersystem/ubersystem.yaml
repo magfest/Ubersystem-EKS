@@ -131,7 +131,7 @@ spec:
               name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -302,7 +302,7 @@ spec:
               name: database-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/${eventname}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
