@@ -11,7 +11,7 @@
 #  path: ./flux/ubersystem
 #  prune: true
 #  interval: 10m
-#  targetNamespace: default
+#  targetNamespace: super2026
 #  postBuild:
 #    substitute:
 #      eventname: super2026
@@ -36,7 +36,7 @@ spec:
   path: ./flux/ubersystem
   prune: true
   interval: 10m
-  targetNamespace: default
+  targetNamespace: super2025
   postBuild:
     substitute:
       eventname: super2025
@@ -61,7 +61,7 @@ spec:
 #  path: ./flux/ubersystem
 #  prune: true
 #  interval: 10m
-#  targetNamespace: default
+#  targetNamespace: west2025
 #  postBuild:
 #    substitute:
 #      eventname: west2025
@@ -86,7 +86,7 @@ spec:
   path: ./flux/ubersystem
   prune: true
   interval: 10m
-  targetNamespace: default
+  targetNamespace: west2024
   postBuild:
     substitute:
       eventname: west2024
@@ -111,7 +111,7 @@ spec:
 #  path: ./flux/ubersystem
 #  prune: true
 #  interval: 10m
-#  targetNamespace: default
+#  targetNamespace: stock2025
 #  postBuild:
 #    substitute:
 #      eventname: stock2025
@@ -136,7 +136,7 @@ spec:
   path: ./flux/ubersystem
   prune: true
   interval: 10m
-  targetNamespace: default
+  targetNamespace: stock2024
   postBuild:
     substitute:
       eventname: stock2024
