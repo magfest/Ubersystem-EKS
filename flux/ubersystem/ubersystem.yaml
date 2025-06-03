@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${eventname}-uploads
+  name: ${eventname}${eventyear}-uploads
   namespace: default
   finalizers:
   - kubernetes.io/pvc-protection
@@ -18,7 +18,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${eventname}-web
+  name: ${eventname}${eventyear}-web
   namespace: default
 spec:
   type: ClusterIP
@@ -28,13 +28,13 @@ spec:
       protocol: TCP
       name: web
   selector:
-    app: ${eventname}-web
+    app: ${eventname}${eventyear}-web
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ${eventname}-web
+  name: ${eventname}${eventyear}-web
   namespace: default
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
@@ -47,7 +47,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ${eventname}-web
+            name: ${eventname}${eventyear}-web
             port:
               number: 80
   ingressClassName: nginx
@@ -56,25 +56,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${eventname}-web
+  name: ${eventname}${eventyear}-web
   namespace: default
   labels:
-    app: ${eventname}-web
+    app: ${eventname}${eventyear}-web
 spec:
   replicas: ${webreplicas:=1}
   selector:
     matchLabels:
-      app: ${eventname}-web
+      app: ${eventname}${eventyear}-web
   template:
     metadata:
       labels:
-        app: ${eventname}-web
+        app: ${eventname}${eventyear}-web
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: ${eventname}-uploads
+      - name: ${eventname}${eventyear}-uploads
         persistentVolumeClaim:
-          claimName: ${eventname}-uploads
+          claimName: ${eventname}${eventyear}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -118,7 +118,7 @@ spec:
               name: ubersystem-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
         - name: "CONFIG_REPO"
           value: "https://github.com/magfest/terraform-aws-magfest.git"
         - name: "CONFIG_PATHS"
@@ -132,28 +132,28 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}-uploads
+          name: ${eventname}${eventyear}-uploads
 
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ${eventname}-create-admin
+  name: ${eventname}${eventyear}-create-admin
   namespace: default
 spec:
   template:
@@ -161,7 +161,7 @@ spec:
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://${eventname}-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
+        command: ["curl", "--fail-with-body", "http://${eventname}${eventyear}-web.default.svc.cluster.local:80/accounts/insert_test_admin"]
       restartPolicy: Never
   backoffLimit: 4
   successfulJobsHistoryLimit: 0
@@ -171,24 +171,24 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ${eventname}-celery-beats
+  name: ${eventname}${eventyear}-celery-beats
   namespace: default
   labels:
-    app: ${eventname}-celery-beats
+    app: ${eventname}${eventyear}-celery-beats
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${eventname}-celery-beats
+      app: ${eventname}${eventyear}-celery-beats
   template:
     metadata:
       labels:
-        app: ${eventname}-celery-beats
+        app: ${eventname}${eventyear}-celery-beats
     spec:
       volumes:
-      - name: ${eventname}-uploads
+      - name: ${eventname}${eventyear}-uploads
         persistentVolumeClaim:
-          claimName: ${eventname}-uploads
+          claimName: ${eventname}${eventyear}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -213,7 +213,7 @@ spec:
               name: ubersystem-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -227,46 +227,46 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}-uploads
+          name: ${eventname}${eventyear}-uploads
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${eventname}-celery-worker
+  name: ${eventname}${eventyear}-celery-worker
   namespace: default
   labels:
-    app: ${eventname}-celery-worker
+    app: ${eventname}${eventyear}-celery-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${eventname}-celery-worker
+      app: ${eventname}${eventyear}-celery-worker
   template:
     metadata:
       labels:
-        app: ${eventname}-celery-worker
+        app: ${eventname}${eventyear}-celery-worker
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: ${eventname}-uploads
+      - name: ${eventname}${eventyear}-uploads
         persistentVolumeClaim:
-          claimName: ${eventname}-uploads
+          claimName: ${eventname}${eventyear}-uploads
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -291,7 +291,7 @@ spec:
               name: ubersystem-app
               key: username
         - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}"
+          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@ubersystem-pool.default:5432/${eventname}${eventyear}"
         - name: "LOG_CONFIG"
           value: "true"
         - name: "CONFIG_REPO"
@@ -305,30 +305,30 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}-redis"
+          value: "${eventname}${eventyear}-redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@${eventname}${eventyear}-rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}-uploads
+          name: ${eventname}${eventyear}-uploads
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: ${eventname}
+  name: ${eventname}${eventyear}
   namespace: default
 spec:
-  name: ${eventname}
+  name: ${eventname}${eventyear}
   owner: app
   cluster:
     name: ubersystem
