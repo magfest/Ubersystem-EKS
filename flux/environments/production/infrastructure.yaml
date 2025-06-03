@@ -48,3 +48,4 @@ spec:
   postBuild:
     substitute:
       efs_filesystem: fs-01f9693f767949e05
+      db_backup_bucket: ubersystem-backups-production/cnpg
