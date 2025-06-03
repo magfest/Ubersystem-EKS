@@ -1,15 +1,16 @@
 config:
   aws:region: us-east-1
-  availability_zones:
+  magfest-uber:availability_zones:
     - us-east-1a
     - us-east-1b
     - us-east-1c
-  cidr_block: 10.0.0.0/16
-  kubernetes_version: "1.32"
-  cluster_admins:
+  magfest-uber:base_domain: uber.reg.magfest.org
+  magfest-uber:cidr_block: 10.0.0.0/16
+  magfest-uber:cluster_admins:
     - arn:aws:iam::278110951434:user/mmurnane
     - arn:aws:iam::278110951434:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_bc7aec9788925d65
-  wildcard_domain: "*.reg.magfest.org"
-  postgres_backup_bucket: ubersystem-backups-production
-  nodes: 3
-  base_domain: uber.reg.magfest.org
+  magfest-uber:kubernetes_version: "1.32"
+  magfest-uber:nodes: 3
+  magfest-uber:postgres_backup_bucket: ubersystem-backups-production
+  magfest-uber:wildcard_domain: '*.reg.magfest.org'
+encryptionsalt: v1:BbrOHwXPVUg=:v1:YBPiGMTRdUwuYTfE:ohlVxSiYQKPvTDyp/Jx8pSfru2EqVQ==
