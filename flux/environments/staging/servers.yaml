@@ -15,7 +15,7 @@ spec:
   postBuild:
     substitute:
       eventname: super2026
-      hostname: super-test.dev.magevent.net
+      hostname: super.dev.magevent.net
       container: ghcr.io/magfest/magprime:main
       webreplicas: "1"
       webram: "128Mi"
@@ -40,7 +40,7 @@ spec:
   postBuild:
     substitute:
       eventname: west2025
-      hostname: west-test.dev.magevent.net
+      hostname: west.dev.magevent.net
       container: ghcr.io/magfest/magwest:west2025
       webram: "128Mi"
       webcpu: "64m"
@@ -64,7 +64,7 @@ spec:
   postBuild:
     substitute:
       eventname: stock2025
-      hostname: stock-test.dev.magevent.net
+      hostname: stock.dev.magevent.net
       container: ghcr.io/magfest/magstock:stock2025
       webram: "128Mi"
       webcpu: "64m"
