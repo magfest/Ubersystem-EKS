@@ -361,6 +361,16 @@ spec:
 #    recovery:
 #      source: ubersystem
 
+# Recover DB from RDS
+  bootstrap:
+    initdb:
+      import:
+        type: microservice
+        databases:
+          - ${eventname}
+        source:
+          externalCluster: rds
+
   externalClusters:
     - name: database
       barmanObjectStore:
@@ -369,6 +379,15 @@ spec:
           inheritFromIAMRole: true
         wal:
           maxParallel: 8
+    - name: rds
+      connectionParameters:
+        # Use the correct IP or host name for the source database
+        host: ubersystem.cxumtwj22g8z.us-east-1.rds.amazonaws.com
+        user: postgres
+        dbname: postgres
+      password:
+        name: rds-password
+        key: password
 
 ---
 apiVersion: postgresql.cnpg.io/v1
