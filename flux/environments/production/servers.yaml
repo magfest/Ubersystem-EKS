@@ -1,29 +1,29 @@
-#---
-#apiVersion: kustomize.toolkit.fluxcd.io/v1
-#kind: Kustomization
-#metadata:
-#  name: ubersystem-super2026
-#  namespace: flux-system
-#spec:
-#  sourceRef:
-#    kind: GitRepository
-#    name: flux-system
-#  path: ./flux/ubersystem
-#  prune: true
-#  interval: 10m
-#  targetNamespace: super2026
-#  postBuild:
-#    substitute:
-#      eventname: super2026
-#      hostname: super2026.reg.magfest.org
-#      container: ghcr.io/magfest/magprime:main
-#      webreplicas: "1"
-#      webram: "128Mi"
-#      webcpu: "64m"
-#      celeryram: "128Mi"
-#      celerycpu: "64m"
-#      config_paths: "uber_config/environments/prod uber_config/events/super/2026"
-#      db_backup_bucket: ubersystem-backups-production
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-super2026
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: super2026
+  postBuild:
+    substitute:
+      eventname: super2026
+      hostname: super2026.reg.magfest.org
+      container: ghcr.io/magfest/magprime:main
+      webreplicas: "3"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/super/2026"
+      db_backup_bucket: ubersystem-backups-production
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -50,32 +50,32 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/super/2025"
       db_backup_bucket: ubersystem-backups-production
-#---
-#apiVersion: kustomize.toolkit.fluxcd.io/v1
-#kind: Kustomization
-#metadata:
-#  name: ubersystem-west2025
-#  namespace: flux-system
-#spec:
-#  sourceRef:
-#    kind: GitRepository
-#    name: flux-system
-#  path: ./flux/ubersystem
-#  prune: true
-#  interval: 10m
-#  targetNamespace: west2025
-#  postBuild:
-#    substitute:
-#      eventname: west2025
-#      hostname: west2025.reg.magfest.org
-#      container: ghcr.io/magfest/magwest:west2025
-#      webreplicas: "1"
-#      webram: "128Mi"
-#      webcpu: "64m"
-#      celeryram: "128Mi"
-#      celerycpu: "64m"
-#      config_paths: "uber_config/environments/prod uber_config/events/west/2025"
-#      db_backup_bucket: ubersystem-backups-production
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-west2025
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: west2025
+  postBuild:
+    substitute:
+      eventname: west2025
+      hostname: west2025.reg.magfest.org
+      container: ghcr.io/magfest/magwest:west2025
+      webreplicas: "3"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/west/2025"
+      db_backup_bucket: ubersystem-backups-production
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -102,32 +102,32 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/west/2024"
       db_backup_bucket: ubersystem-backups-production
-#---
-#apiVersion: kustomize.toolkit.fluxcd.io/v1
-#kind: Kustomization
-#metadata:
-#  name: ubersystem-stock2025
-#  namespace: flux-system
-#spec:
-#  sourceRef:
-#    kind: GitRepository
-#    name: flux-system
-#  path: ./flux/ubersystem
-#  prune: true
-#  interval: 10m
-#  targetNamespace: stock2025
-#  postBuild:
-#    substitute:
-#      eventname: stock2025
-#      hostname: stock2025.reg.magfest.org
-#      container: ghcr.io/magfest/magstock:stock2025
-#      webreplicas: "1"
-#      webram: "128Mi"
-#      webcpu: "64m"
-#      celeryram: "128Mi"
-#      celerycpu: "64m"
-#      config_paths: "uber_config/environments/prod uber_config/events/stock/2025"
-#      db_backup_bucket: ubersystem-backups-production
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ubersystem-stock2025
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./flux/ubersystem
+  prune: true
+  interval: 10m
+  targetNamespace: stock2025
+  postBuild:
+    substitute:
+      eventname: stock2025
+      hostname: stock2025.reg.magfest.org
+      container: ghcr.io/magfest/magstock:stock2025
+      webreplicas: "3"
+      webram: "128Mi"
+      webcpu: "64m"
+      celeryram: "128Mi"
+      celerycpu: "64m"
+      config_paths: "uber_config/environments/prod uber_config/events/stock/2025"
+      db_backup_bucket: ubersystem-backups-production
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
