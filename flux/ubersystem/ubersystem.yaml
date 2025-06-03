@@ -132,22 +132,22 @@ spec:
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
         - name: "uber_cherrypy_tools_sessions_host"
-          value: "${eventname}-redis"
+          value: "redis"
         - name: "uber_cherrypy_tools_sessions_prefix"
           value: "uber"
         - name: "uber_cherrypy_tools_sessions_storage_type"
           value: "redis"
         - name: "uber_redis_host"
-          value: "${eventname}-redis"
+          value: "redis"
         - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@${eventname}-rabbitmq:5672/uber"
+          value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "uber_dev_box"
           value: "True"
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: ${eventname}-uploads
+          name: uploads
 
 ---
 apiVersion: batch/v1
