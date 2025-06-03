@@ -19,7 +19,7 @@ metadata:
 spec:
   summary: "Ubersystem"
   eventMetadata:
-    env: "staging"
+    env: "production"
   providerRef:
     name: slack-bot
   eventSeverity: error
@@ -36,7 +36,7 @@ metadata:
   namespace: flux-system
 spec:
   rules:
-  - host: flux-webhook.dev.magevent.net
+  - host: flux-webhook.reg.magfest.org
     http:
       paths:
       - pathType: Prefix
