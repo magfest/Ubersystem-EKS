@@ -92,6 +92,7 @@ spec:
       containers:
       - name: web
         image: "${container}"
+        imagePullPolicy: Always
         livenessProbe:
           timeoutSeconds: 10
           periodSeconds: 60
@@ -211,6 +212,7 @@ spec:
       containers:
       - name: celery-beats
         image: "${container}"
+        imagePullPolicy: Always
         args: ["celery-beat"]
         resources:
           requests:
@@ -290,6 +292,7 @@ spec:
       containers:
       - name: celery-worker
         image: "${container}"
+        imagePullPolicy: Always
         args: ["celery-worker"]
         resources:
           requests:
