@@ -22,10 +22,32 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-sc
+  storageClassName: ""
+  volumeName: uploads-${eventname}
   resources:
     requests:
       storage: 20Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: uploads-${eventname}
+spec:
+  storageClassName: efs-sc
+  claimRef:
+    name: uploads
+    namespace: ${eventname}
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 20Gi
+  csi:
+    driver: efs.csi.aws.com
+    volumeAttributes:
+      path: /${eventname}
 
 ---
 apiVersion: v1
