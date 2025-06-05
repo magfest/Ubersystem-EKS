@@ -15,7 +15,7 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: uploads
+  name: uploaded-files
   namespace: ${eventname}
   finalizers:
   - kubernetes.io/pvc-protection
@@ -23,7 +23,7 @@ spec:
   accessModes:
     - ReadWriteMany
   storageClassName: ""
-  volumeName: uploads-${eventname}
+  volumeName: uploaded-files-${eventname}
   resources:
     requests:
       storage: 20Gi
@@ -32,11 +32,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: uploads-${eventname}
+  name: uploaded-files-${eventname}
 spec:
   storageClassName: efs-sc
   claimRef:
-    name: uploads
+    name: uploaded-files
     namespace: ${eventname}
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
@@ -108,9 +108,9 @@ spec:
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: uploads
+      - name: uploaded-files
         persistentVolumeClaim:
-          claimName: uploads
+          claimName: uploaded-files
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -189,7 +189,7 @@ spec:
               key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: uploads
+          name: uploaded-files
 
 ---
 apiVersion: batch/v1
@@ -228,9 +228,9 @@ spec:
         app: celery-beats
     spec:
       volumes:
-      - name: uploads
+      - name: uploaded-files
         persistentVolumeClaim:
-          claimName: uploads
+          claimName: uploaded-files
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -286,7 +286,7 @@ spec:
               key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: uploads
+          name: uploaded-files
 
 ---
 apiVersion: apps/v1
@@ -308,9 +308,9 @@ spec:
     spec:
       serviceAccountName: ubersystem-email
       volumes:
-      - name: uploads
+      - name: uploaded-files
         persistentVolumeClaim:
-          claimName: uploads
+          claimName: uploaded-files
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -366,7 +366,7 @@ spec:
               key: secrets
         volumeMounts:
         - mountPath: "/app/uploaded_files"
-          name: uploads
+          name: uploaded-files
 
 ### Database
 ---
