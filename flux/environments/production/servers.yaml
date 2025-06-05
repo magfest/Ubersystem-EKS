@@ -24,6 +24,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/super/2026"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -50,6 +51,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/super/2025"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -76,6 +78,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/west/2025"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -102,6 +105,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/west/2024"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -128,6 +132,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/stock/2025"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -154,3 +159,4 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/prod uber_config/events/stock/2024"
       db_backup_bucket: ubersystem-backups-production
+      efs_filesystem: fs-01f9693f767949e05

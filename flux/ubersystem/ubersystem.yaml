@@ -48,6 +48,7 @@ spec:
     driver: efs.csi.aws.com
     volumeAttributes:
       path: /${eventname}
+    volumeHandle: ${efs_filesystem}
 
 ---
 apiVersion: v1

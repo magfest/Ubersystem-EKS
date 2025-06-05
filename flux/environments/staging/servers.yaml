@@ -24,6 +24,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/staging uber_config/events/super/2026/staging"
       db_backup_bucket: ubersystem-backups-staging
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -49,6 +50,7 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/staging uber_config/events/west/2025/staging"
       db_backup_bucket: ubersystem-backups-staging
+      efs_filesystem: fs-01f9693f767949e05
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -74,3 +76,4 @@ spec:
       celerycpu: "64m"
       config_paths: "uber_config/environments/staging uber_config/events/stock/2025/staging"
       db_backup_bucket: ubersystem-backups-staging
+      efs_filesystem: fs-01f9693f767949e05
