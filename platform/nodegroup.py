@@ -77,6 +77,7 @@ aws.eks.NodeGroup("UbersystemArm",
     launch_template={
         "version": template.latest_version,
         "id": template.id
-    }
+    },
+    ami_type="AL2023_ARM_64_STANDARD"
 )
 
