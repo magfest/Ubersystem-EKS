@@ -40,7 +40,7 @@ template = aws.ec2.LaunchTemplate("Ubersystem",
     vpc_security_group_ids=[eks.node_security_group.id,]
 )
 
-nodes = aws.eks.NodeGroup("Ubersystem",
+aws.eks.NodeGroup("Ubersystem",
     cluster_name=eks.eks_cluster.name,
     node_group_name="Ubersystem",
     node_role_arn=node_role.arn,
@@ -54,6 +54,26 @@ nodes = aws.eks.NodeGroup("Ubersystem",
         "max_unavailable": 1,
     },
     instance_types=["t3.medium"],
+    launch_template={
+        "version": template.latest_version,
+        "id": template.id
+    }
+)
+
+aws.eks.NodeGroup("UbersystemArm",
+    cluster_name=eks.eks_cluster.name,
+    node_group_name="UbersystemArm",
+    node_role_arn=node_role.arn,
+    subnet_ids=[subnet.id for subnet in vpc.private_subnets],
+    scaling_config={
+        "desired_size": config.require_int("nodes"),
+        "max_size": config.require_int("nodes"),
+        "min_size": 1,
+    },
+    update_config={
+        "max_unavailable": 1,
+    },
+    instance_types=["t4g.medium"],
     launch_template={
         "version": template.latest_version,
         "id": template.id
