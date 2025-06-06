@@ -14,7 +14,7 @@ config:
   magfest-uber:postgres_backup_bucket: ubersystem-backups-staging
   magfest-uber:wildcard_domain: '*.dev.magevent.net'
   magfest-uber:uber_instances:
-    - stock
-    - west
-    - super
+    - stock2025
+    - west2025
+    - super2026
 encryptionsalt: v1:F3KtCytLKnI=:v1:wRbd+wJEziegX3Is:wkwD27o/XLqbFs6FcWNEArAQw5gDqQ==
