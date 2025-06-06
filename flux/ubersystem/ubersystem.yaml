@@ -47,7 +47,7 @@ spec:
   csi:
     driver: efs.csi.aws.com
     volumeAttributes:
-      path: /${eventname}
+      path: /
     volumeHandle: ${efs_filesystem}
 
 ---
@@ -190,6 +190,7 @@ spec:
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
+          subPath: ${eventname}
 
 ---
 apiVersion: batch/v1
@@ -287,6 +288,7 @@ spec:
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
+          subPath: ${eventname}
 
 ---
 apiVersion: apps/v1
@@ -367,6 +369,7 @@ spec:
         volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
+          subPath: ${eventname}
 
 ### Database
 ---
