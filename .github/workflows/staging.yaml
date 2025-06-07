@@ -22,7 +22,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - run: pip install -r platform/requirements.txt
-      - uses: pulumi/actions@v6
+      - name: preview
+        uses: pulumi/actions@v6
         with:
           command: preview
           stack-name: organization/staging
@@ -30,6 +31,7 @@ jobs:
           work-dir: platform
           comment-on-pr: true
           comment-on-summary: true
+          color: always
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
       - run: |
