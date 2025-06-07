@@ -2,7 +2,37 @@
 name: Pulumi Production
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - main
 jobs:
+  pulumi_preview:
+    environment: production-plan
+    name: Preview Changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - run: pip install -r platform/requirements.txt
+      - uses: pulumi/actions@v6
+        with:
+          command: preview
+          stack-name: organization/production
+          cloud-url: ${{ secrets.PULUMI_BUCKET }}
+          work-dir: platform
+          comment-on-pr: true
+          comment-on-summary: true
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+
   update_production:
     environment: production
     name: Update Production
