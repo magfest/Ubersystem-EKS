@@ -39,6 +39,7 @@ jobs:
       - run: |
           PREVIEW_RESULT="${{ steps.run_preview.outputs.result }}"
           echo $PREVIEW_RESULT
+          ls
           cat update.plan
           echo "preview_result=${{ steps.preview.outputs.result }}" >> "$GITHUB_OUTPUT"
 
