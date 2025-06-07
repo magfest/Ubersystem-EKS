@@ -35,6 +35,7 @@ jobs:
           plan: /tmp/plan.json
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+      - run: cat /tmp/plan.json
       - run: echo has_changes=$(jq '.resourcePlans | map(.steps[0] == "same") | all | not' < /tmp/plan.json) >> "$GITHUB_OUTPUT"
 
   update_production:
