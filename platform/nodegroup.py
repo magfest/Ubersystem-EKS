@@ -60,24 +60,24 @@ aws.eks.NodeGroup("Ubersystem",
     }
 )
 
-#aws.eks.NodeGroup("UbersystemArm",
-#    cluster_name=eks.eks_cluster.name,
-#    node_group_name="UbersystemArm",
-#    node_role_arn=node_role.arn,
-#    subnet_ids=[subnet.id for subnet in vpc.private_subnets],
-#    scaling_config={
-#        "desired_size": config.require_int("nodes"),
-#        "max_size": config.require_int("nodes"),
-#        "min_size": 1,
-#    },
-#    update_config={
-#        "max_unavailable": 1,
-#    },
-#    instance_types=["t4g.medium"],
-#    launch_template={
-#        "version": template.latest_version,
-#        "id": template.id
-#    },
-#    ami_type="AL2023_ARM_64_STANDARD"
-#)
+aws.eks.NodeGroup("UbersystemArm",
+    cluster_name=eks.eks_cluster.name,
+    node_group_name="UbersystemArm",
+    node_role_arn=node_role.arn,
+    subnet_ids=[subnet.id for subnet in vpc.private_subnets],
+    scaling_config={
+        "desired_size": config.require_int("nodes"),
+        "max_size": config.require_int("nodes"),
+        "min_size": 1,
+    },
+    update_config={
+        "max_unavailable": 1,
+    },
+    instance_types=["t4g.medium"],
+    launch_template={
+        "version": template.latest_version,
+        "id": template.id
+    },
+    ami_type="AL2023_ARM_64_STANDARD"
+)
 
