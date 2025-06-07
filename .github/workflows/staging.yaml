@@ -34,7 +34,6 @@ jobs:
           work-dir: platform
           comment-on-pr: true
           comment-on-summary: true
-          color: always
           plan: /tmp/plan.json
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
