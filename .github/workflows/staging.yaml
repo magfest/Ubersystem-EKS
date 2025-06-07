@@ -10,6 +10,8 @@ jobs:
     environment: staging
     name: Preview Changes
     runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.get_output.outputs.has_changes }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,7 +38,8 @@ jobs:
           plan: /tmp/plan.json
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-      - run: echo has_changes=$(jq '.resourcePlans | map(.steps[0] == "same") | all | not' < /tmp/plan.json) >> "$GITHUB_OUTPUT"
+      - id: get_output
+        run: echo has_changes=$(jq '.resourcePlans | map(.steps[0] == "same") | all | not' < /tmp/plan.json) >> "$GITHUB_OUTPUT"
 
   update_staging:
     environment: staging
