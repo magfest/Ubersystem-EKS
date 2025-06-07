@@ -34,22 +34,17 @@ jobs:
           color: always
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-      - name: Set job output based on preview exit code
-        # If preview_exit_code was 1 (error), we want the job to fail.
-        # Otherwise, we output the actual exit code from preview.
-        run: |
-          if [ "${{ steps.preview.outputs.exit_code }}" == "1" ]; then
-            echo "Pulumi preview failed with an error."
-            exit 1
-          fi
-          echo "preview_exit_code=${{ steps.preview.outputs.exit_code }}" >> "$GITHUB_OUTPUT"
+      - run: |
+        PREVIEW_RESULT="${{ steps.run_preview.outputs.result }}"
+        echo $PREVIEW_RESULT
+        echo "preview_result=${{ steps.preview.outputs.result }}" >> "$GITHUB_OUTPUT"
 
   update_production:
     environment: production
     name: Update Production
     runs-on: ubuntu-latest
     needs: pulumi_preview
-    if: needs.pulumi_preview.outputs.preview_exit_code == '2'
+    if: needs.pulumi_preview.outputs.preview_result == 'success'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
