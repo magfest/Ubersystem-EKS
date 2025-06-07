@@ -33,22 +33,17 @@ jobs:
           comment-on-pr: true
           comment-on-summary: true
           color: always
-          plan: /tmp/update.plan
+          plan: /tmp/plan.json
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-      - run: |
-          PREVIEW_RESULT="${{ steps.run_preview.outputs.result }}"
-          echo $PREVIEW_RESULT
-          ls /tmp
-          cat /tmp/update.plan
-          echo "preview_result=${{ steps.preview.outputs.result }}" >> "$GITHUB_OUTPUT"
+      - run: echo has_changes=$(jq '.resourcePlans | map(.steps[0] == "same") | all | not' < /tmp/plan.json) >> "$GITHUB_OUTPUT"
 
   update_staging:
     environment: staging
     name: Update Staging
     runs-on: ubuntu-latest
     needs: pulumi_preview
-    if: needs.pulumi_preview.outputs.preview_result == 'success'
+    if: needs.pulumi_preview.outputs.has_changes == 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
