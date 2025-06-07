@@ -48,6 +48,7 @@ jobs:
     environment: production
     name: Update Production
     runs-on: ubuntu-latest
+    needs: pulumi_preview
     if: needs.pulumi_preview.outputs.preview_exit_code == '2'
     steps:
       - uses: actions/checkout@v4
