@@ -1,6 +1,7 @@
 ---
 name: Pulumi Staging
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - main
@@ -31,11 +32,21 @@ jobs:
           comment-on-summary: true
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+      - name: Set job output based on preview exit code
+        # If preview_exit_code was 1 (error), we want the job to fail.
+        # Otherwise, we output the actual exit code from preview.
+        run: |
+          if [ "${{ steps.preview.outputs.exit_code }}" == "1" ]; then
+            echo "Pulumi preview failed with an error."
+            exit 1
+          fi
+          echo "preview_exit_code=${{ steps.preview.outputs.exit_code }}" >> "$GITHUB_OUTPUT"
 
   update_staging:
     environment: staging
     name: Update Staging
     runs-on: ubuntu-latest
+    if: needs.pulumi_preview.outputs.preview_exit_code == '2'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
