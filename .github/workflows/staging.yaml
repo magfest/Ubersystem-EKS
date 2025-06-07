@@ -33,14 +33,14 @@ jobs:
           comment-on-pr: true
           comment-on-summary: true
           color: always
-          plan: update.plan
+          plan: /tmp/update.plan
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
       - run: |
           PREVIEW_RESULT="${{ steps.run_preview.outputs.result }}"
           echo $PREVIEW_RESULT
-          ls
-          cat update.plan
+          ls /tmp
+          cat /tmp/update.plan
           echo "preview_result=${{ steps.preview.outputs.result }}" >> "$GITHUB_OUTPUT"
 
   update_staging:
