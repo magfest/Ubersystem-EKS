@@ -8,6 +8,7 @@ config:
   magfest-uber:cidr_block: 10.0.0.0/16
   magfest-uber:cluster_admins:
     - arn:aws:iam::025244845726:user/mmurnane
+    - arn:aws:iam::025244845726:user/rvosaki
     - arn:aws:iam::025244845726:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_bc7aec9788925d65
   magfest-uber:kubernetes_version: "1.32"
   magfest-uber:nodes: 3
