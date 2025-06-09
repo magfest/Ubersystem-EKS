@@ -64,5 +64,6 @@ jobs:
           stack-name: organization/production
           cloud-url: ${{ secrets.PULUMI_BUCKET }}
           work-dir: platform
+          suppress-progress: true
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
