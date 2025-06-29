@@ -27,6 +27,14 @@ spec:
       - name: uploaded-files
         persistentVolumeClaim:
           claimName: uploaded-files
+      - name: config-key
+        projected:
+          sources:
+          - secret:
+              name: flux-system
+              items:
+                - key: identity
+                  path: id_rsa
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -85,6 +93,10 @@ spec:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
           subPath: ${eventname}
+        - name: config-key
+          mountPath: /root/.ssh
+          readOnly: true
+          optional: true
 
 ---
 apiVersion: apps/v1
@@ -108,6 +120,14 @@ spec:
       - name: uploaded-files
         persistentVolumeClaim:
           claimName: uploaded-files
+      - name: config-key
+        projected:
+          sources:
+          - secret:
+              name: flux-system
+              items:
+                - key: identity
+                  path: id_rsa
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -147,6 +167,10 @@ spec:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
           subPath: ${eventname}
+        - name: config-key
+          mountPath: /root/.ssh
+          readOnly: true
+          optional: true
 
 ---
 apiVersion: apps/v1
@@ -171,6 +195,14 @@ spec:
       - name: uploaded-files
         persistentVolumeClaim:
           claimName: uploaded-files
+      - name: config-key
+        projected:
+          sources:
+          - secret:
+              name: flux-system
+              items:
+                - key: identity
+                  path: id_rsa
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
@@ -210,6 +242,10 @@ spec:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
           subPath: ${eventname}
+        - name: config-key
+          mountPath: /root/.ssh
+          readOnly: true
+          optional: true
 
 ---
 apiVersion: batch/v1
