@@ -1,4 +1,4 @@
-name: magfest-uber
+name: RAMS
 description: EKS Hosted Ubersystem for MAGFest
 runtime:
   name: python

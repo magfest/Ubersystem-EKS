@@ -5,90 +5,6 @@ metadata:
   name: ${eventname}
 
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ubersystem-email
-  namespace: ${eventname}
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: uploaded-files
-  namespace: ${eventname}
-  finalizers:
-  - kubernetes.io/pvc-protection
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: ""
-  volumeName: uploaded-files-${eventname}
-  resources:
-    requests:
-      storage: 20Gi
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: uploaded-files-${eventname}
-spec:
-  storageClassName: efs-sc
-  claimRef:
-    name: uploaded-files
-    namespace: ${eventname}
-  persistentVolumeReclaimPolicy: Retain
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteMany
-  capacity:
-    storage: 20Gi
-  csi:
-    driver: efs.csi.aws.com
-    volumeAttributes:
-      path: /
-    volumeHandle: ${efs_filesystem}
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: web
-  namespace: ${eventname}
-spec:
-  type: ClusterIP
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      name: web
-  selector:
-    app: web
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: web
-  namespace: ${eventname}
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 100m
-spec:
-  rules:
-  - host: ${hostname}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web
-            port:
-              number: 80
-  ingressClassName: nginx
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -136,30 +52,18 @@ spec:
             port: 80
         resources:
           requests:
-            memory: ${webram}
-            cpu: ${webcpu}
+            memory: ${webram:=128Mi}
+            cpu: ${webcpu:=64m}
           limits:
-            memory: "1024Mi"
-            cpu: "1000m"
+            memory: ${webram_limit:=1024Mi}
+            cpu: ${webcpu_limit:=1000m}
         ports:
         - containerPort: 80
-        env:
-        - name: "DB_PASSWORD"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: password
-        - name: "DB_USERNAME"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: username
+        env: &env_config
         - name: LOG_CONFIG
           value: "true"
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
         - name: "CONFIG_REPO"
-          value: "https://github.com/magfest/terraform-aws-magfest.git"
+          value: ${config_repo:=https://github.com/magfest/RAMS-Config.git}
         - name: "CONFIG_PATHS"
           value: "${config_paths}"
         - name: "uber_cherrypy_server_socket_port"
@@ -170,16 +74,6 @@ spec:
           value: "10"
         - name: "uber_cherrypy_server_socket_timeout"
           value: "1"
-        - name: "uber_cherrypy_tools_sessions_host"
-          value: "redis"
-        - name: "uber_cherrypy_tools_sessions_prefix"
-          value: "uber"
-        - name: "uber_cherrypy_tools_sessions_storage_type"
-          value: "redis"
-        - name: "uber_redis_host"
-          value: "redis"
-        - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@rabbitmq:5672/uber"
         - name: "uber_hostname"
           value: "localhost"
         - name: "UBERSYSTEM_SECRETS"
@@ -187,28 +81,10 @@ spec:
             secretKeyRef:
               name: uber-secrets
               key: secrets
-        volumeMounts:
+        volumeMounts: &volume_mounts
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
           subPath: ${eventname}
-
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: create-admin
-  namespace: ${eventname}
-spec:
-  template:
-    spec:
-      containers:
-      - name: create-admin
-        image: quay.io/curl/curl:latest
-        command: ["curl", "--fail-with-body", "http://web:80/accounts/insert_test_admin"]
-      restartPolicy: Never
-  backoffLimit: 4
-  successfulJobsHistoryLimit: 0
-  failedJobsHistoryLimit: 0
 
 ---
 apiVersion: apps/v1
@@ -219,7 +95,7 @@ metadata:
   labels:
     app: celery-beats
 spec:
-  replicas: 1
+  replicas: ${beatsreplicas:=1}
   selector:
     matchLabels:
       app: celery-beats
@@ -240,55 +116,13 @@ spec:
         args: ["celery-beat"]
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
+            memory: ${beatsram:=256Mi}
+            cpu: ${beatscpu:=500m}
           limits:
-            memory: "512Mi"
-            cpu: "500m"
-        env:
-        - name: "DB_PASSWORD"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: password
-        - name: "DB_USERNAME"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: username
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
-        - name: "CONFIG_REPO"
-          value: "https://github.com/magfest/terraform-aws-magfest.git"
-        - name: "CONFIG_PATHS"
-          value: "${config_paths}"
-        - name: "uber_cherrypy_server_socket_port"
-          value: "80"
-        - name: "uber_cherrypy_server_socket_host"
-          value: "0.0.0.0"
-        - name: "uber_cherrypy_server_socket_timeout"
-          value: "1"
-        - name: "uber_cherrypy_tools_sessions_host"
-          value: "redis"
-        - name: "uber_cherrypy_tools_sessions_prefix"
-          value: "uber"
-        - name: "uber_cherrypy_tools_sessions_storage_type"
-          value: "redis"
-        - name: "uber_redis_host"
-          value: "redis"
-        - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@rabbitmq:5672/uber"
-        - name: "uber_hostname"
-          value: "localhost"
-        - name: "UBERSYSTEM_SECRETS"
-          valueFrom:
-            secretKeyRef:
-              name: uber-secrets
-              key: secrets
-        volumeMounts:
-        - mountPath: "/app/uploaded_files"
-          name: uploaded-files
-          subPath: ${eventname}
+            memory: ${beatsram_limit:=512Mi}
+            cpu: ${beatscpu_limit:=500m}
+        env: *env_config
+        volumeMounts: *volume_mounts
 
 ---
 apiVersion: apps/v1
@@ -299,7 +133,7 @@ metadata:
   labels:
     app: celery-worker
 spec:
-  replicas: 1
+  replicas: ${celeryreplicas:=1}
   selector:
     matchLabels:
       app: celery-worker
@@ -321,150 +155,28 @@ spec:
         args: ["celery-worker"]
         resources:
           requests:
-            memory: ${celeryram}
-            cpu: ${celerycpu}
+            memory: ${celeryram:=128Mi}
+            cpu: ${celerycpu:=64m}
           limits:
-            memory: "1024Mi"
-            cpu: "1000m"
-        env:
-        - name: "DB_PASSWORD"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: password
-        - name: "DB_USERNAME"
-          valueFrom:
-            secretKeyRef:
-              name: database-app
-              key: username
-        - name: "DB_CONNECTION_STRING"
-          value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app"
-        - name: "CONFIG_REPO"
-          value: "https://github.com/magfest/terraform-aws-magfest.git"
-        - name: "CONFIG_PATHS"
-          value: "${config_paths}"
-        - name: "uber_cherrypy_server_socket_port"
-          value: "80"
-        - name: "uber_cherrypy_server_socket_host"
-          value: "0.0.0.0"
-        - name: "uber_cherrypy_server_socket_timeout"
-          value: "1"
-        - name: "uber_cherrypy_tools_sessions_host"
-          value: "redis"
-        - name: "uber_cherrypy_tools_sessions_prefix"
-          value: "uber"
-        - name: "uber_cherrypy_tools_sessions_storage_type"
-          value: "redis"
-        - name: "uber_redis_host"
-          value: "redis"
-        - name: "uber_secret_broker_url"
-          value: "amqp://celery:celery@rabbitmq:5672/uber"
-        - name: "uber_hostname"
-          value: "localhost"
-        - name: "UBERSYSTEM_SECRETS"
-          valueFrom:
-            secretKeyRef:
-              name: uber-secrets
-              key: secrets
-        volumeMounts:
-        - mountPath: "/app/uploaded_files"
-          name: uploaded-files
-          subPath: ${eventname}
-
-### Database
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: database
-  namespace: ${eventname}
-spec:
-  description: "${eventname} Postgres Cluster"
-  instances: 3
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql
-    major: 17
-  storage:
-    size: 10Gi
-    storageClass: ebs-sc
-  backup:
-    barmanObjectStore:
-      destinationPath: "s3://${db_backup_bucket}/${eventname}"
-      s3Credentials:
-        inheritFromIAMRole: true
-    retentionPolicy: "30d"
-
-# Sample DB Recovery from S3
-#  bootstrap:
-#    recovery:
-#      source: ubersystem
-
-# Recover DB from RDS
-#  bootstrap:
-#    initdb:
-#      import:
-#        type: microservice
-#        databases:
-#          - ${eventname}
-#        source:
-#          externalCluster: rds
-
-  externalClusters:
-    - name: database
-      barmanObjectStore:
-        destinationPath: "s3://${db_backup_bucket}/${eventname}"
-        s3Credentials:
-          inheritFromIAMRole: true
-        wal:
-          maxParallel: 8
-#    - name: rds
-#      connectionParameters:
-#        # Use the correct IP or host name for the source database
-#        host: ubersystem.cxumtwj22g8z.us-east-1.rds.amazonaws.com
-#        user: postgres
-#        dbname: postgres
-#      password:
-#        name: rds-password
-#        key: password
+            memory: ${celeryram_limit:=1024Mi}
+            cpu: ${celerycpu_limit:=1000m}
+        env: *env_config
+        volumeMounts: *volume_mounts
 
 ---
-apiVersion: postgresql.cnpg.io/v1
-kind: Pooler
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: postgres-pool
+  name: create-admin
   namespace: ${eventname}
 spec:
-  cluster:
-    name: database
-  instances: 1
-  type: rw
-  pgbouncer:
-    poolMode: transaction
-    parameters:
-      max_client_conn: "1000"
-      default_pool_size: "20"
-
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Backup
-metadata:
-  name: database-backup
-  namespace: ${eventname}
-spec:
-  method: barmanObjectStore
-  cluster:
-    name: database
-
----
-apiVersion: postgresql.cnpg.io/v1
-kind: ScheduledBackup
-metadata:
-  name: database-backup
-  namespace: ${eventname}
-spec:
-  schedule: "0 0 0 * * *"
-  backupOwnerReference: self
-  cluster:
-    name: database
+  template:
+    spec:
+      containers:
+      - name: create-admin
+        image: quay.io/curl/curl:latest
+        command: ["curl", "--fail-with-body", "http://web:80/accounts/insert_test_admin"]
+      restartPolicy: Never
+  backoffLimit: 4
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0

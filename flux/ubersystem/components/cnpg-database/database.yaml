@@ -1,0 +1,97 @@
+### Database
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: database
+  namespace: ${eventname}
+spec:
+  description: "${eventname} Postgres Cluster"
+  instances: ${cnpg_replicas:=3}
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql
+    major: 17
+  storage:
+    size: ${cnpg_db_size:=10Gi}
+    storageClass: ebs-sc
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://${db_backup_bucket}/${eventname}"
+      s3Credentials:
+        inheritFromIAMRole: true
+    retentionPolicy: ${cnpg_db_retention:=30d}
+
+# Sample DB Recovery from S3
+#  bootstrap:
+#    recovery:
+#      source: ubersystem
+
+# Recover DB from RDS
+#  bootstrap:
+#    initdb:
+#      import:
+#        type: microservice
+#        databases:
+#          - ${eventname}
+#        source:
+#          externalCluster: rds
+
+  externalClusters:
+    - name: database
+      barmanObjectStore:
+        destinationPath: "s3://${db_backup_bucket}/${eventname}"
+        s3Credentials:
+          inheritFromIAMRole: true
+        wal:
+          maxParallel: 8
+#    - name: rds
+#      connectionParameters:
+#        # Use the correct IP or host name for the source database
+#        host: ubersystem.cxumtwj22g8z.us-east-1.rds.amazonaws.com
+#        user: postgres
+#        dbname: postgres
+#      password:
+#        name: rds-password
+#        key: password
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: postgres-pool
+  namespace: ${eventname}
+spec:
+  cluster:
+    name: database
+  instances: 1
+  type: rw
+  pgbouncer:
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "20"
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: database-backup
+  namespace: ${eventname}
+spec:
+  method: barmanObjectStore
+  cluster:
+    name: database
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: database-backup
+  namespace: ${eventname}
+spec:
+  schedule: "0 0 0 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: database

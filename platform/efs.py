@@ -8,7 +8,7 @@ import nodegroup
 config = pulumi.Config()
 
 efs_sg = aws.ec2.SecurityGroup("allow_efs_access",
-    vpc_id=vpc.vpc.id,
+    vpc_id=vpc.vpc_id,
     egress=[{
         "from_port": 0,
         "to_port": 0,
@@ -56,7 +56,7 @@ efs_csi_driver = aws.eks.Addon("aws-efs-csi-driver",
 
 efs = aws.efs.FileSystem("Ubersystem",
     tags={
-        "Name": "Ubersystem",
+        "Name": config.require("cluster_name"),
     })
 
 for idx, subnet in enumerate(vpc.private_subnets):

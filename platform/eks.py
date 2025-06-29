@@ -26,7 +26,7 @@ cluster_amazon_eks_cluster_policy = aws.iam.RolePolicyAttachment("cluster_Amazon
     role=cluster_role.name)
 
 node_security_group = aws.ec2.SecurityGroup("allow_internet",
-    vpc_id=vpc.vpc.id,
+    vpc_id=vpc.vpc_id,
     egress=[{
         "from_port": 0,
         "to_port": 0,
@@ -48,7 +48,7 @@ node_security_group = aws.ec2.SecurityGroup("allow_internet",
 )
 
 eks_cluster = aws.eks.Cluster("Ubersystem",
-    name="Ubersystem",
+    name=config.require("cluster_name"),
     access_config={
         "authentication_mode": "API",
     },

@@ -40,8 +40,8 @@ spec:
         - containerPort: 6379
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "50m"
+            memory: ${redisram:=128Mi}
+            cpu: ${rediscpu:=50m}
           limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: ${redisram_limit:=256Mi}
+            cpu: ${rediscpu_limit:=200m}

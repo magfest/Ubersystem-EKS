@@ -1,0 +1,55 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+patches:
+- patch: &env_patch |-
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: ${rds_secret}
+            key: password
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: ${rds_secret}
+            key: username
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_HOSTNAME
+        valueFrom:
+          secretKeyRef:
+            name: ${rds_secret}
+            key: hostname
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_DATABASE
+        valueFrom:
+          secretKeyRef:
+            name: ${rds_secret}
+            key: database
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_CONNECTION_STRING
+        value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOSTNAME):5432/$(DB_DATABASE)
+  target:
+    kind: Deployment
+    name: web
+
+- patch: *env_patch
+  target:
+    kind: Deployment
+    name: celery-beats
+
+- patch: *env_patch
+  target:
+    kind: Deployment
+    name: celery-worker

@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- database.yaml
+
+patches:
+- patch: &env_patch |-
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: database-app
+            key: password
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: database-app
+            key: username
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_CONNECTION_STRING
+        value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app
+  target:
+    kind: Deployment
+    name: web
+
+- patch: *env_patch
+  target:
+    kind: Deployment
+    name: celery-beats
+
+- patch: *env_patch
+  target:
+    kind: Deployment
+    name: celery-worker
