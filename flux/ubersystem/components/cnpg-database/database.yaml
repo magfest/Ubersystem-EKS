@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: database
+  name: ${db_primary:=database}
   namespace: ${eventname}
 spec:
   description: "${eventname} Postgres Cluster"
@@ -24,9 +24,9 @@ spec:
     retentionPolicy: ${cnpg_db_retention:=30d}
 
 # Sample DB Recovery from S3
-#  bootstrap:
-#    recovery:
-#      source: restore
+  bootstrap:
+    recovery:
+      source: ${db_restore:=restore}
 
 # Recover DB from RDS
 #  bootstrap:
@@ -39,7 +39,7 @@ spec:
 #          externalCluster: rds
 
   externalClusters:
-    - name: database
+    - name: ${db_restore:=restore}
       barmanObjectStore:
         destinationPath: "s3://${db_backup_bucket}/${eventname}"
         s3Credentials:
@@ -64,7 +64,7 @@ metadata:
   namespace: ${eventname}
 spec:
   cluster:
-    name: database
+    name: ${db_primary:=database}
   instances: 1
   type: rw
   pgbouncer:
@@ -82,7 +82,7 @@ metadata:
 spec:
   method: barmanObjectStore
   cluster:
-    name: database
+    name: ${db_primary:=database}
 
 ---
 apiVersion: postgresql.cnpg.io/v1
@@ -94,4 +94,4 @@ spec:
   schedule: "0 0 0 * * *"
   backupOwnerReference: self
   cluster:
-    name: database
+    name: ${db_primary:=database}
