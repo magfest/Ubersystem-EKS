@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: database
+  name: database-v2
   namespace: ${eventname}
 spec:
   description: "${eventname} Postgres Cluster"
@@ -64,7 +64,7 @@ metadata:
   namespace: ${eventname}
 spec:
   cluster:
-    name: database
+    name: database-v2
   instances: 1
   type: rw
   pgbouncer:
@@ -82,7 +82,7 @@ metadata:
 spec:
   method: barmanObjectStore
   cluster:
-    name: database
+    name: database-v2
 
 ---
 apiVersion: postgresql.cnpg.io/v1
@@ -94,4 +94,4 @@ spec:
   schedule: "0 0 0 * * *"
   backupOwnerReference: self
   cluster:
-    name: database
+    name: database-v2
