@@ -29,12 +29,15 @@ spec:
           claimName: uploaded-files
       - name: config-key
         projected:
+          defaultMode: 0600
           sources:
           - secret:
               name: flux-system
               items:
                 - key: identity
                   path: id_rsa
+                - key: known_hosts
+                  path: known_hosts
       terminationGracePeriodSeconds: 5
       containers:
       - name: web
@@ -122,12 +125,15 @@ spec:
           claimName: uploaded-files
       - name: config-key
         projected:
+          defaultMode: 0600
           sources:
           - secret:
               name: flux-system
               items:
                 - key: identity
                   path: id_rsa
+                - key: known_hosts
+                  path: known_hosts
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-beats
@@ -197,12 +203,15 @@ spec:
           claimName: uploaded-files
       - name: config-key
         projected:
+          defaultMode: 0600
           sources:
           - secret:
               name: flux-system
               items:
                 - key: identity
                   path: id_rsa
+                - key: known_hosts
+                  path: known_hosts
       terminationGracePeriodSeconds: 5
       containers:
       - name: celery-worker
