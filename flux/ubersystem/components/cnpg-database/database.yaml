@@ -38,14 +38,14 @@ spec:
 #        source:
 #          externalCluster: rds
 
-  externalClusters:
-    - name: database
-      barmanObjectStore:
-        destinationPath: "s3://${db_backup_bucket}/${eventname}"
-        s3Credentials:
-          inheritFromIAMRole: true
-        wal:
-          maxParallel: 8
+#  externalClusters:
+#    - name: database
+#      barmanObjectStore:
+#        destinationPath: "s3://${db_backup_bucket}/${eventname}"
+#        s3Credentials:
+#          inheritFromIAMRole: true
+#        wal:
+#          maxParallel: 8
 #    - name: rds
 #      connectionParameters:
 #        # Use the correct IP or host name for the source database
