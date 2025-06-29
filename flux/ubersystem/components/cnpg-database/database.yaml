@@ -8,6 +8,9 @@ metadata:
 spec:
   description: "${eventname} Postgres Cluster"
   instances: ${cnpg_replicas:=3}
+  serviceAccountTemplate:
+    metadata:
+      name: database
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
