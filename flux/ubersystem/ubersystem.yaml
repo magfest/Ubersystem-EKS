@@ -59,7 +59,7 @@ spec:
             cpu: ${webcpu_limit:=1000m}
         ports:
         - containerPort: 80
-        env: &env_config
+        env:
         - name: LOG_CONFIG
           value: "true"
         - name: "CONFIG_REPO"
@@ -81,7 +81,7 @@ spec:
             secretKeyRef:
               name: uber-secrets
               key: secrets
-        volumeMounts: &volume_mounts
+        volumeMounts:
         - mountPath: "/app/uploaded_files"
           name: uploaded-files
           subPath: ${eventname}
@@ -121,8 +121,32 @@ spec:
           limits:
             memory: ${beatsram_limit:=512Mi}
             cpu: ${beatscpu_limit:=500m}
-        env: *env_config
-        volumeMounts: *volume_mounts
+        env:
+        - name: LOG_CONFIG
+          value: "true"
+        - name: "CONFIG_REPO"
+          value: ${config_repo:=https://github.com/magfest/RAMS-Config.git}
+        - name: "CONFIG_PATHS"
+          value: "${config_paths}"
+        - name: "uber_cherrypy_server_socket_port"
+          value: "80"
+        - name: "uber_cherrypy_server_socket_host"
+          value: "0.0.0.0"
+        - name: "uber_cherrypy_server_thread_pool"
+          value: "10"
+        - name: "uber_cherrypy_server_socket_timeout"
+          value: "1"
+        - name: "uber_hostname"
+          value: "localhost"
+        - name: "UBERSYSTEM_SECRETS"
+          valueFrom:
+            secretKeyRef:
+              name: uber-secrets
+              key: secrets
+        volumeMounts:
+        - mountPath: "/app/uploaded_files"
+          name: uploaded-files
+          subPath: ${eventname}
 
 ---
 apiVersion: apps/v1
@@ -160,8 +184,32 @@ spec:
           limits:
             memory: ${celeryram_limit:=1024Mi}
             cpu: ${celerycpu_limit:=1000m}
-        env: *env_config
-        volumeMounts: *volume_mounts
+        env:
+        - name: LOG_CONFIG
+          value: "true"
+        - name: "CONFIG_REPO"
+          value: ${config_repo:=https://github.com/magfest/RAMS-Config.git}
+        - name: "CONFIG_PATHS"
+          value: "${config_paths}"
+        - name: "uber_cherrypy_server_socket_port"
+          value: "80"
+        - name: "uber_cherrypy_server_socket_host"
+          value: "0.0.0.0"
+        - name: "uber_cherrypy_server_thread_pool"
+          value: "10"
+        - name: "uber_cherrypy_server_socket_timeout"
+          value: "1"
+        - name: "uber_hostname"
+          value: "localhost"
+        - name: "UBERSYSTEM_SECRETS"
+          valueFrom:
+            secretKeyRef:
+              name: uber-secrets
+              key: secrets
+        volumeMounts:
+        - mountPath: "/app/uploaded_files"
+          name: uploaded-files
+          subPath: ${eventname}
 
 ---
 apiVersion: batch/v1
