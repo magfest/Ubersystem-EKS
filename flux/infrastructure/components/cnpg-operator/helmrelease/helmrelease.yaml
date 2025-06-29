@@ -15,6 +15,3 @@ spec:
         name: cnpg
         namespace: cnpg-system
       interval: 12h
-  postRenderers:
-  - kustomize:
-      path: ./flux/infrastructure/components/cnpg-operator/catalog/
