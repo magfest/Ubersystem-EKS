@@ -8,9 +8,6 @@ metadata:
 spec:
   description: "${eventname} Postgres Cluster"
   instances: ${cnpg_replicas:=3}
-  serviceAccountTemplate:
-    metadata:
-      name: database
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
@@ -22,6 +19,10 @@ spec:
   backup:
     barmanObjectStore:
       destinationPath: "s3://${db_backup_bucket}/${eventname}"
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
       s3Credentials:
         inheritFromIAMRole: true
     retentionPolicy: ${cnpg_db_retention:=30d}
