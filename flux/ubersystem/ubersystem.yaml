@@ -49,12 +49,12 @@ spec:
           httpGet:
             path: /landing/
             port: 80
-        readinessProbe:
-          timeoutSeconds: 10
-          periodSeconds: 60
-          httpGet:
-            path: /devtools/health
-            port: 80
+        #readinessProbe:
+        #  timeoutSeconds: 10
+        #  periodSeconds: 60
+        #  httpGet:
+        #    path: /devtools/health
+        #    port: 80
         startupProbe:
           initialDelaySeconds: 20
           failureThreshold: 20
