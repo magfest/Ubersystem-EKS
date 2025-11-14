@@ -73,7 +73,7 @@ aws.eks.NodeGroup("UbersystemArm",
     update_config={
         "max_unavailable": 1,
     },
-    instance_types=["t4g.medium"],
+    instance_types=[config.require("instance_type")],
     launch_template={
         "version": template.latest_version,
         "id": template.id
