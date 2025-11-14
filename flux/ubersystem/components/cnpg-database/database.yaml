@@ -13,6 +13,10 @@ spec:
     kind: ClusterImageCatalog
     name: postgresql
     major: 17
+  postgresql:
+    parameters:
+      pg_stat_statements.max: "100000"
+      pg_stat_statements.track: all
   storage:
     size: ${cnpg_db_size:=10Gi}
     storageClass: ebs-sc
