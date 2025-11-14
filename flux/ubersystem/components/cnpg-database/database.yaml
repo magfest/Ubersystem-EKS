@@ -17,6 +17,7 @@ spec:
     parameters:
       pg_stat_statements.max: "100000"
       pg_stat_statements.track: all
+      log_statement: all
   storage:
     size: ${cnpg_db_size:=10Gi}
     storageClass: ebs-sc
