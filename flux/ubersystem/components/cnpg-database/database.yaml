@@ -80,8 +80,8 @@ spec:
   type: rw
   pgbouncer:
     poolMode: transaction
-    server_tls_sslmode: disable
     parameters:
+      server_tls_sslmode: disable
       max_client_conn: "1000"
       default_pool_size: "100"
 
