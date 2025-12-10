@@ -78,6 +78,8 @@ spec:
   type: rw
   pgbouncer:
     poolMode: transaction
+    clientTLSSecret:
+      name: database-pooler
     parameters:
       max_client_conn: "1000"
       default_pool_size: "100"
