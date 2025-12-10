@@ -18,6 +18,8 @@ spec:
       pg_stat_statements.max: "100000"
       pg_stat_statements.track: all
       log_statement: all
+    pg_hba:
+      - host all all all scram-sha-256
   storage:
     size: ${cnpg_db_size:=10Gi}
     storageClass: ebs-sc
@@ -78,8 +80,7 @@ spec:
   type: rw
   pgbouncer:
     poolMode: transaction
-    serverTLSSecret:
-      name: database-pooler
+    server_tls_sslmode: disable
     parameters:
       max_client_conn: "1000"
       default_pool_size: "100"
