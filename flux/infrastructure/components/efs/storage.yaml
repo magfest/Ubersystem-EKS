@@ -5,6 +5,7 @@ metadata:
   name: efs-sc
 provisioner: efs.csi.aws.com
 reclaimPolicy: Retain
+allowVolumeExpansion: true
 parameters:
   provisioningMode: efs-ap
   fileSystemId: ${efs_filesystem}
@@ -17,6 +18,7 @@ metadata:
   name: ebs-sc
 provisioner: ebs.csi.aws.com
 reclaimPolicy: Retain
+allowVolumeExpansion: true
 parameters:
   csi.storage.k8s.io/fstype: xfs
   type: gp3
