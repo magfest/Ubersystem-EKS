@@ -65,5 +65,5 @@ s3_distribution = aws.cloudfront.Distribution("s3_distribution",
             "locations": []
         }
     },
-    aliases=[config.require("wildcard_domain")]
+    aliases=[config.require("wildcard_domain"), *(config.get_object("subject_alternative_names") or [])]
 )
