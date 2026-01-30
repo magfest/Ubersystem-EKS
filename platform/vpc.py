@@ -90,7 +90,8 @@ if not config.get("skip_nat_gateway"):
         allocation_id=eip.id,
         tags={
             "Name": "Ubersystem Internet NAT"
-        }
+        },
+        opts=pulumi.ResourceOptions(delete_before_replace=True)
     )
 
     aws.ec2.Route("private-internet-route", route_table_id=private_route_table.id, destination_cidr_block="0.0.0.0/0", nat_gateway_id=nat.id)

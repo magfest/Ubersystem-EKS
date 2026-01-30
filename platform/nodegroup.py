@@ -60,9 +60,9 @@ template = aws.ec2.LaunchTemplate("Ubersystem",
 #    }
 #)
 
-aws.eks.NodeGroup("UbersystemArm",
+aws.eks.NodeGroup("Ubersystem",
     cluster_name=eks.eks_cluster.name,
-    node_group_name="UbersystemArm",
+    node_group_name="Ubersystem",
     node_role_arn=node_role.arn,
     subnet_ids=[subnet.id for subnet in vpc.private_subnets],
     scaling_config={
