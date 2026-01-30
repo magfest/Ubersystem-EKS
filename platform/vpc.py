@@ -29,7 +29,7 @@ if not config.get("skip_internet_gateway"):
     aws.ec2.Route("public-internet-route", route_table_id=public_route_table.id, destination_cidr_block="0.0.0.0/0", gateway_id=internet_gateway.id)
 
 cidr = ipaddress.IPv4Network(config.require("cidr_block"))
-subnets = cidr.subnets(prefixlen_diff=8)
+subnets = cidr.subnets(prefixlen_diff=4)
 private_subnets = []
 public_subnets = []
 if config.get_object("private_subnet_ids"):
