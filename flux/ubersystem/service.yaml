@@ -4,6 +4,11 @@ kind: Service
 metadata:
   name: web
   namespace: ${eventname}
+  annotations:
+    dashy.io/title: ${title}
+    dashy.io/url: https://${hostname}
+    dashy.io/icon: favicon
+    dashy.io/group: ubersystem
 spec:
   type: ClusterIP
   ports:
