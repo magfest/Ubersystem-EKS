@@ -8,7 +8,7 @@ metadata:
     dashy.io/title: ${dashy_title}
     dashy.io/url: https://${hostname}
     dashy.io/icon: generative
-    dashy.io/group: ubersystem
+    dashy.io/group: Uber Prod
 spec:
   type: ClusterIP
   ports:
