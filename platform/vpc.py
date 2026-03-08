@@ -50,7 +50,7 @@ else:
         private_subnet_route_table_association = aws.ec2.RouteTableAssociation(f"private-{az}", subnet_id=private_subnet.id, route_table_id=private_route_table.id)
         private_subnets.append(private_subnet)
     
-if config.get_object("public_subnet_ids"):
+if type(config.get_object("public_subnet_ids")) is list:
     for subnet_id in config.get_object("public_subnet_ids"):
         public_subnets.append(aws.ec2.get_subnet(id=subnet_id))
 else:

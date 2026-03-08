@@ -60,24 +60,48 @@ template = aws.ec2.LaunchTemplate("Ubersystem",
 #    }
 #)
 
-aws.eks.NodeGroup("Ubersystem",
-    cluster_name=eks.eks_cluster.name,
-    node_group_name="Ubersystem",
-    node_role_arn=node_role.arn,
-    subnet_ids=[subnet.id for subnet in vpc.private_subnets],
-    scaling_config={
-        "desired_size": config.require_int("nodes"),
-        "max_size": config.require_int("nodes"),
-        "min_size": 1,
-    },
-    update_config={
-        "max_unavailable": 1,
-    },
-    instance_types=[config.require("instance_type")],
-    launch_template={
-        "version": template.latest_version,
-        "id": template.id
-    },
-    ami_type="AL2023_ARM_64_STANDARD"
-)
+if config.get_object("nodegroup_subnet_ids"):
+    for subnet_id in config.get_object("nodegroup_subnet_ids"):
+        aws.eks.NodeGroup(f"Ubersystem-{subnet_id}",
+            cluster_name=eks.eks_cluster.name,
+            node_group_name=f"Ubersystem-{subnet_id}",
+            node_role_arn=node_role.arn,
+            subnet_ids=[subnet_id,],
+            scaling_config={
+                "desired_size": config.require_int("nodes"),
+                "max_size": config.require_int("nodes"),
+                "min_size": 1,
+            },
+            update_config={
+                "max_unavailable": 1,
+            },
+            instance_types=[config.require("instance_type")],
+            launch_template={
+                "version": template.latest_version,
+                "id": template.id
+            },
+            ami_type="AL2023_ARM_64_STANDARD"
+        )
+
+else:
+    aws.eks.NodeGroup("Ubersystem",
+        cluster_name=eks.eks_cluster.name,
+        node_group_name="Ubersystem",
+        node_role_arn=node_role.arn,
+        subnet_ids=[subnet.id for subnet in vpc.private_subnets],
+        scaling_config={
+            "desired_size": config.require_int("nodes"),
+            "max_size": config.require_int("nodes"),
+            "min_size": 1,
+        },
+        update_config={
+            "max_unavailable": 1,
+        },
+        instance_types=[config.require("instance_type")],
+        launch_template={
+            "version": template.latest_version,
+            "id": template.id
+        },
+        ami_type="AL2023_ARM_64_STANDARD"
+    )
 

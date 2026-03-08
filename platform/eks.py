@@ -66,17 +66,27 @@ eks_cluster = aws.eks.Cluster("Ubersystem",
         "endpoint_public_access": True,
         "security_group_ids": [node_security_group.id]
     },
-    opts = pulumi.ResourceOptions(depends_on=[cluster_amazon_eks_cluster_policy]))
+    opts = pulumi.ResourceOptions(
+        depends_on=[cluster_amazon_eks_cluster_policy],
+        replace_on_changes=["vpcId", "subnetIds", "vpcConfig"],
+        delete_before_replace=True,
+    ))
 
 for cluster_admin in config.require_object("cluster_admins"):
     aws.eks.AccessEntry(
         resource_name=f"{cluster_admin}",
         cluster_name=eks_cluster.name,
-        principal_arn=cluster_admin)
+        principal_arn=cluster_admin,
+        opts=pulumi.ResourceOptions(
+            replace_with=[eks_cluster]
+        ))
     aws.eks.AccessPolicyAssociation(cluster_admin,
         cluster_name=eks_cluster.name,
         policy_arn="arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
         principal_arn=cluster_admin,
         access_scope={
             "type": "cluster",
-        })
+        },
+        opts=pulumi.ResourceOptions(
+            replace_with=[eks_cluster]
+        ))

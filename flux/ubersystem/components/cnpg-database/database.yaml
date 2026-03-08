@@ -21,16 +21,29 @@ spec:
   storage:
     size: ${cnpg_db_size:=10Gi}
     storageClass: ebs-sc
+
+  bootstrap:
+    recovery:
+      source: primary-cluster-backup 
+
+  externalClusters:
+    - name: primary-cluster-backup
+      barmanObjectStore:
+        destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_read_generation}"
+        s3Credentials:
+          inheritFromIAMRole: true
+
   backup:
     barmanObjectStore:
-      destinationPath: "s3://${db_backup_bucket}/${eventname}"
-      wal:
-        compression: gzip
-      data:
-        compression: gzip
+      destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_write_generation}"
       s3Credentials:
         inheritFromIAMRole: true
-    retentionPolicy: ${cnpg_db_retention:=30d}
+      wal:
+        compression: gzip
+        maxParallel: 2
+      data:
+        compression: gzip
+      retentionPolicy: ${cnpg_db_retention:=30d}
 
 # Sample DB Recovery from S3
 #  bootstrap:
