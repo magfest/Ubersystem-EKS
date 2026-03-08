@@ -45,7 +45,7 @@ spec:
         maxParallel: 2
       data:
         compression: gzip
-      retentionPolicy: ${cnpg_db_retention:=30d}
+    retentionPolicy: ${cnpg_db_retention:=30d}
 
 ---
 apiVersion: postgresql.cnpg.io/v1
