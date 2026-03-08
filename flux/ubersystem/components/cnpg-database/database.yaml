@@ -32,6 +32,8 @@ spec:
         destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_read_generation}"
         s3Credentials:
           inheritFromIAMRole: true
+        wal:
+          maxParallel: 8
 
   backup:
     barmanObjectStore:
@@ -44,39 +46,6 @@ spec:
       data:
         compression: gzip
       retentionPolicy: ${cnpg_db_retention:=30d}
-
-# Sample DB Recovery from S3
-#  bootstrap:
-#    recovery:
-#      source: ${db_restore:=restore}
-
-# Recover DB from RDS
-#  bootstrap:
-#    initdb:
-#      import:
-#        type: microservice
-#        databases:
-#          - ${eventname}
-#        source:
-#          externalCluster: rds
-
-  externalClusters:
-    - name: ${db_restore:=restore}
-      barmanObjectStore:
-        destinationPath: "s3://${db_backup_bucket}/${eventname}"
-        s3Credentials:
-          inheritFromIAMRole: true
-        wal:
-          maxParallel: 8
-#    - name: rds
-#      connectionParameters:
-#        # Use the correct IP or host name for the source database
-#        host: ubersystem.cxumtwj22g8z.us-east-1.rds.amazonaws.com
-#        user: postgres
-#        dbname: postgres
-#      password:
-#        name: rds-password
-#        key: password
 
 ---
 apiVersion: postgresql.cnpg.io/v1
