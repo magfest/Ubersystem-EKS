@@ -25,6 +25,8 @@ spec:
   bootstrap:
     recovery:
       source: primary-cluster-backup 
+      recoveryTarget:
+        targetTimeline: "latest"
 
   externalClusters:
     - name: primary-cluster-backup
