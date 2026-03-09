@@ -23,7 +23,7 @@ spec:
     storageClass: ebs-sc
 
   bootstrap:
-    $patch: replace
+    initdb: {}
     recovery:
       source: primary-cluster-backup 
 
