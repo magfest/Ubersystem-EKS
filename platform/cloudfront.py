@@ -6,19 +6,15 @@ import vpc
 import cert
 config = pulumi.Config()
 
-cloudfront_prefix_list = aws.ec2.get_managed_prefix_list(
-    name="com.amazonaws.global.cloudfront.origin-facing"
-)
-
 nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
     vpc_id=vpc.vpc_id,
-    description="Security group for internal NLB allowing CloudFront",
+    description="Security group for internal ALB",
     ingress=[{
         "from_port": 80,
         "to_port": 80,
         "protocol": "TCP",
-        "prefix_list_ids": [cloudfront_prefix_list.id],
-        "description": "Allow CloudFront VPC Origin"
+        "cidr_blocks": ["0.0.0.0/0"],
+        "description": "Allow ALB"
     },
     {
         "from_port": -1,
@@ -41,6 +37,15 @@ nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
     protocol="HTTP",
     vpc_id=vpc.vpc_id,
     target_type="ip", 
+    health_check={
+        "protocol": "HTTP",
+        "port": "10254", 
+        "path": "/healthz",
+        "healthy_threshold": 2,
+        "unhealthy_threshold": 2,
+        "timeout": 3,
+        "interval": 10,
+    }
 )
 
 nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
