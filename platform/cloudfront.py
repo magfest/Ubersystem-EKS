@@ -19,6 +19,13 @@ nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
         "protocol": "TCP",
         "prefix_list_ids": [cloudfront_prefix_list.id],
         "description": "Allow CloudFront VPC Origin"
+    },
+    {
+        "from_port": 3, # ICMP Type 3 (Destination Unreachable)
+        "to_port": 4,   # ICMP Code 4 (Fragmentation Needed)
+        "protocol": "icmp",
+        "cidr_blocks": ["0.0.0.0/0"],
+        "description": "Allow ICMP for Path MTU Discovery"
     }],
     egress=[{
         "from_port": 0,
