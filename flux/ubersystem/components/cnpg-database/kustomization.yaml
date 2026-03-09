@@ -26,6 +26,11 @@ patches:
       value:
         name: DB_CONNECTION_STRING
         value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool:5432/app
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DB_READONLY_CONNECTION_STRING
+        value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@postgres-pool-ro:5432/app
   target:
     kind: Deployment
     name: web
