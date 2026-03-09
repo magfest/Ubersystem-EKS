@@ -29,6 +29,7 @@ spec:
   externalClusters:
     - name: primary-cluster-backup
       barmanObjectStore:
+        serverName: database
         destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_read_generation}"
         s3Credentials:
           inheritFromIAMRole: true
