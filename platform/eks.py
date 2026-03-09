@@ -46,8 +46,8 @@ node_security_group = aws.ec2.SecurityGroup("allow_internet",
         "cidr_blocks": [subnet.cidr_block for subnet in vpc.private_subnets]
     },
     {
-        "from_port": 3, # ICMP Type 3 (Destination Unreachable)
-        "to_port": 4,   # ICMP Code 4 (Fragmentation Needed)
+        "from_port": -1,
+        "to_port": -1,
         "protocol": "icmp",
         "cidr_blocks": ["0.0.0.0/0"],
         "description": "Allow ICMP for Path MTU Discovery"

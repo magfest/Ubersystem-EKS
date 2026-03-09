@@ -21,8 +21,8 @@ nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
         "description": "Allow CloudFront VPC Origin"
     },
     {
-        "from_port": 3, # ICMP Type 3 (Destination Unreachable)
-        "to_port": 4,   # ICMP Code 4 (Fragmentation Needed)
+        "from_port": -1,
+        "to_port": -1,
         "protocol": "icmp",
         "cidr_blocks": ["0.0.0.0/0"],
         "description": "Allow ICMP for Path MTU Discovery"
@@ -38,7 +38,7 @@ nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
 nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
     name="Ubersystem-http",
     port=80,
-    protocol="TCP",
+    protocol="HTTP",
     vpc_id=vpc.vpc_id,
     target_type="ip", 
 )
@@ -46,7 +46,7 @@ nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
 nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
     name="Ubersystem",
     internal=True,
-    load_balancer_type="network",
+    load_balancer_type="application",
     subnets=[x.id for x in vpc.private_subnets],
     enable_cross_zone_load_balancing=True,
     security_groups=[nlb_sg.id],
@@ -55,16 +55,16 @@ nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
 nginx_listener = aws.lb.Listener("nginx-listener",
     load_balancer_arn=nginx_nlb.arn,
     port=80,
-    protocol="TCP",
+    protocol="HTTP",
     default_actions=[{
         "type": "forward",
         "target_group_arn": nginx_tg.arn
     }]
 )
 
-vpc_origin = aws.cloudfront.VpcOrigin("nginx-vpc-origin",
+vpc_origin = aws.cloudfront.VpcOrigin("vpc-origin",
     vpc_origin_endpoint_config={
-        "name": "Ubersystem",
+        "name": "uber",
         "arn": nginx_nlb.arn,
         "http_port": 80,
         "https_port": 443,
