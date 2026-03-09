@@ -25,6 +25,10 @@ cluster_amazon_eks_cluster_policy = aws.iam.RolePolicyAttachment("cluster_Amazon
     policy_arn="arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
     role=cluster_role.name)
 
+cloudfront_prefix_list = aws.ec2.get_managed_prefix_list(
+    name="com.amazonaws.global.cloudfront.origin-facing"
+)
+
 node_security_group = aws.ec2.SecurityGroup("allow_internet",
     vpc_id=vpc.vpc_id,
     egress=[{
@@ -40,10 +44,17 @@ node_security_group = aws.ec2.SecurityGroup("allow_internet",
         "self": True
     },
     {
-        "from_port": 32000,
-        "to_port": 32000,
+        "from_port": 80,
+        "to_port": 80,
         "protocol": "TCP",
         "cidr_blocks": [subnet.cidr_block for subnet in vpc.public_subnets]
+    },
+    {
+        "from_port": 80,
+        "to_port": 80,
+        "protocol": "TCP",
+        "prefix_list_ids": [cloudfront_prefix_list.id],
+        "description": "Allow CloudFront VPC Origin"
     }]
 )
 

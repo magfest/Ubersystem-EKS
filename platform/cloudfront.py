@@ -2,19 +2,57 @@ import json
 import pulumi
 import pulumi_aws as aws
 
+import vpc
 import cert
 config = pulumi.Config()
 
+nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
+    name="Ubersystem-http",
+    port=80,
+    protocol="TCP",
+    vpc_id=vpc.vpc_id,
+    target_type="ip", 
+)
+
+nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
+    name="Ubersystem",
+    internal=True,
+    load_balancer_type="network",
+    subnets=[x.id for x in vpc.private_subnets],
+    enable_cross_zone_load_balancing=True,
+)
+
+nginx_listener = aws.lb.Listener("nginx-listener",
+    load_balancer_arn=nginx_nlb.arn,
+    port=80,
+    protocol="TCP",
+    default_actions=[{
+        "type": "forward",
+        "target_group_arn": nginx_tg.arn
+    }]
+)
+
+vpc_origin = aws.cloudfront.VpcOrigin("nginx-vpc-origin",
+    vpc_origin_endpoint_config={
+        "name": "Ubersystem",
+        "arn": nginx_nlb.arn,
+        "http_port": 80,
+        "https_port": 443,
+        "origin_protocol_policy": "http-only",
+        "origin_ssl_protocols": {
+            "items": ["TLSv1.2"],
+            "quantity": 1,
+        },
+    }
+)
+
 s3_distribution = aws.cloudfront.Distribution("s3_distribution",
     origins=[{
-        "domain_name": config.require("base_domain"),
+        "domain_name": nginx_nlb.dns_name,
         "origin_id": config.require("cluster_name"),
-         "custom_origin_config": {
-            "http_port": 80,
-            "https_port": 443,
-            "origin_protocol_policy": "http-only",
-            "origin_ssl_protocols": ["TLSv1.2"],
-        },
+        "vpc_origin_config": {
+            "vpc_origin_id": vpc_origin.id, 
+        }
     }],
     enabled=True,
     is_ipv6_enabled=True,

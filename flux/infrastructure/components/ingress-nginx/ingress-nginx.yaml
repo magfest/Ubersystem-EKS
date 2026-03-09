@@ -34,18 +34,22 @@ spec:
   values:
     controller:
       service:
+        type: ClusterIP
         enableHttps: false
         targetPorts:
           http: http
-        nodePorts:
-          http: 32000
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
-          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-          service.beta.kubernetes.io/aws-load-balancer-type: external
-          service.beta.kubernetes.io/aws-load-balancer-name: uber
-          external-dns.alpha.kubernetes.io/hostname: ${fallback_hostname}
       admissionWebhooks:
         enabled: false
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: ingress-nginx-tgb
+  namespace: ingress-nginx
+spec:
+  serviceRef:
+    name: ingress-nginx-controller 
+    port: 80
+  
+  targetGroupARN: ${targetgroup_arn}
+  targetType: ip
