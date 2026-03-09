@@ -25,6 +25,8 @@ spec:
         namespace: kube-system
   values:
     clusterName: "${clustername}"
+    vpcId: "${vpcId}"
+    region: "${region}"
     
     serviceAccount:
       create: true
