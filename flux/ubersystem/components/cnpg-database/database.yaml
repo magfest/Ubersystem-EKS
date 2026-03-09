@@ -67,6 +67,23 @@ spec:
 
 ---
 apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: postgres-pool-ro
+  namespace: ${eventname}
+spec:
+  cluster:
+    name: ${db_primary:=database}
+  instances: 1
+  type: ro
+  pgbouncer:
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "100"
+
+---
+apiVersion: postgresql.cnpg.io/v1
 kind: Backup
 metadata:
   name: database-backup
