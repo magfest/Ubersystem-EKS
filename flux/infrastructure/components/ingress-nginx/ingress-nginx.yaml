@@ -34,9 +34,9 @@ spec:
   values:
     controller:
       service:
+        enableHttps: false
         targetPorts:
           http: http
-          https: http
         nodePorts:
           http: 32000
         annotations:
