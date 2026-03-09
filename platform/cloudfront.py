@@ -6,6 +6,28 @@ import vpc
 import cert
 config = pulumi.Config()
 
+cloudfront_prefix_list = aws.ec2.get_managed_prefix_list(
+    name="com.amazonaws.global.cloudfront.origin-facing"
+)
+
+nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
+    vpc_id=vpc.vpc_id,
+    description="Security group for internal NLB allowing CloudFront",
+    ingress=[{
+        "from_port": 80,
+        "to_port": 80,
+        "protocol": "TCP",
+        "prefix_list_ids": [cloudfront_prefix_list.id],
+        "description": "Allow CloudFront VPC Origin"
+    }],
+    egress=[{
+        "from_port": 0,
+        "to_port": 0,
+        "protocol": "-1",
+        "cidr_blocks": ["0.0.0.0/0"],
+    }]
+)
+
 nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
     name="Ubersystem-http",
     port=80,
@@ -20,6 +42,7 @@ nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
     load_balancer_type="network",
     subnets=[x.id for x in vpc.private_subnets],
     enable_cross_zone_load_balancing=True,
+    security_groups=[nlb_sg.id],
 )
 
 nginx_listener = aws.lb.Listener("nginx-listener",
