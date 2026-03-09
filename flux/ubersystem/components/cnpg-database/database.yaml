@@ -23,7 +23,6 @@ spec:
     storageClass: ebs-sc
 
   bootstrap:
-    initdb: {}
     recovery:
       source: primary-cluster-backup 
 
