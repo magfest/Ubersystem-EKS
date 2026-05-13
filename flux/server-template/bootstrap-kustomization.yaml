@@ -15,7 +15,7 @@ spec:
     - name: infrastructure
   postBuild:
     substitute:
-      eventname: ${eventname}
-      db_backup_bucket: ${db_backup_bucket}
-      cnpg_read_generation: ${cnpg_read_generation:=}
-      cnpg_force_bootstrap: ${cnpg_force_bootstrap:=}
+      eventname: "${eventname}"
+      db_backup_bucket: "${db_backup_bucket}"
+      cnpg_read_generation: "${cnpg_read_generation:=}"
+      cnpg_force_bootstrap: "${cnpg_force_bootstrap:=}"
