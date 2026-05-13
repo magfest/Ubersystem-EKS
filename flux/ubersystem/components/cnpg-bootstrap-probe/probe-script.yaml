@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cnpg-bootstrap-probe-script
+  namespace: ${eventname}
+data:
+  probe.sh: |
+    #!/bin/sh
+    set -eu
+    PREFIX="${EVENT}${READ_GEN}/database/base/"
+    if [ -n "${FORCE_MODE:-}" ]; then
+      MODE="$FORCE_MODE"
+    elif kubectl -n "$EVENT" get cm cnpg-bootstrap -o jsonpath='{.data.mode}' 2>/dev/null | grep -q '^recovery$'; then
+      MODE=recovery
+    elif aws s3 ls "s3://${BUCKET}/${PREFIX}" 2>/dev/null | grep -q .; then
+      MODE=recovery
+    else
+      MODE=initdb
+    fi
+    echo "Selected bootstrap mode: $MODE (event=$EVENT, prefix=$PREFIX)"
+    kubectl -n "$EVENT" create configmap cnpg-bootstrap \
+      --from-literal=mode="$MODE" \
+      --from-file=bootstrap_block=/scripts/${MODE}.yaml \
+      --dry-run=client -o yaml | kubectl -n "$EVENT" apply -f -
+    kubectl -n flux-system create configmap "cnpg-bootstrap-${EVENT}" \
+      --from-literal=mode="$MODE" \
+      --from-file=bootstrap_block=/scripts/${MODE}.yaml \
+      --dry-run=client -o yaml | kubectl -n flux-system apply -f -
+  initdb.yaml: |
+    initdb:
+          database: app
+          owner: app
+  recovery.yaml: |
+    recovery:
+          source: primary-cluster-backup
+          recoveryTarget:
+            targetTLI: "latest"

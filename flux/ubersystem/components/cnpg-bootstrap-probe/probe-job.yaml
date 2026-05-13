@@ -1,0 +1,34 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cnpg-bootstrap-probe
+  namespace: ${eventname}
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: database
+      containers:
+        - name: probe
+          image: alpine/k8s:1.34.0
+          command: ["/bin/sh", "/scripts/probe.sh"]
+          env:
+            - name: EVENT
+              value: "${eventname}"
+            - name: BUCKET
+              value: "${db_backup_bucket}"
+            - name: READ_GEN
+              value: "${cnpg_read_generation}"
+            - name: FORCE_MODE
+              value: "${cnpg_force_bootstrap:=}"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: cnpg-bootstrap-probe-script
+            defaultMode: 0o755

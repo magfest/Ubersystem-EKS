@@ -1,5 +1,35 @@
 ### Database
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: database-store-read
+  namespace: ${eventname}
+spec:
+  configuration:
+    destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_read_generation}"
+    s3Credentials:
+      inheritFromIAMRole: true
+    wal:
+      maxParallel: 8
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: database-store-write
+  namespace: ${eventname}
+spec:
+  retentionPolicy: ${cnpg_db_retention:=30d}
+  configuration:
+    destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_write_generation}"
+    s3Credentials:
+      inheritFromIAMRole: true
+    wal:
+      compression: gzip
+      maxParallel: 2
+    data:
+      compression: gzip
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -23,32 +53,20 @@ spec:
     storageClass: ebs-sc
 
   bootstrap:
-    recovery:
-      source: primary-cluster-backup 
-      recoveryTarget:
-        targetTLI: "latest"
+    ${bootstrap_block}
 
   externalClusters:
     - name: primary-cluster-backup
-      barmanObjectStore:
-        serverName: database
-        destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_read_generation}"
-        s3Credentials:
-          inheritFromIAMRole: true
-        wal:
-          maxParallel: 8
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: database-store-read
 
-  backup:
-    barmanObjectStore:
-      destinationPath: "s3://${db_backup_bucket}/${eventname}${cnpg_write_generation}"
-      s3Credentials:
-        inheritFromIAMRole: true
-      wal:
-        compression: gzip
-        maxParallel: 2
-      data:
-        compression: gzip
-    retentionPolicy: ${cnpg_db_retention:=30d}
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: database-store-write
 
 ---
 apiVersion: postgresql.cnpg.io/v1
@@ -91,7 +109,9 @@ metadata:
   name: database-backup
   namespace: ${eventname}
 spec:
-  method: barmanObjectStore
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
   cluster:
     name: ${db_primary:=database}
 
@@ -103,6 +123,10 @@ metadata:
   namespace: ${eventname}
 spec:
   schedule: "0 0 0 * * *"
+  immediate: true
   backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
   cluster:
     name: ${db_primary:=database}

@@ -1,0 +1,56 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ${server}
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: ubersystem-eks
+  path: ./flux/ubersystem
+  prune: false
+  interval: 10m
+  components:
+    - ./components/rabbitmq
+    - ./components/redis
+    - ./components/cnpg-database
+  dependsOn:
+    - name: infrastructure
+    - name: ${server}-bootstrap
+  postBuild:
+    substitute:
+      eventname: ${eventname}
+      hostname: ${hostname}
+      container: ${container}
+      config_repo: ${config_repo:=https://github.com/magfest/RAMS-Config.git}
+      config_paths: ${config_paths}
+      db_backup_bucket: ${db_backup_bucket}
+      efs_filesystem: ${efs_filesystem}
+      cnpg_read_generation: ${cnpg_read_generation:=}
+      cnpg_write_generation: ${cnpg_write_generation:=}
+      cnpg_db_size: ${cnpg_db_size:=10Gi}
+      cnpg_db_retention: ${cnpg_db_retention:=30d}
+      cnpg_replicas: ${cnpg_replicas:=3}
+      db_primary: ${db_primary:=database}
+      db_restore: ${db_restore:=}
+      dashy_title: ${dashy_title:=}
+      webreplicas: ${webreplicas:=1}
+      webram: ${webram:=128Mi}
+      webram_limit: ${webram_limit:=1024Mi}
+      webcpu: ${webcpu:=64m}
+      webcpu_limit: ${webcpu_limit:=1000m}
+      beatsreplicas: ${beatsreplicas:=1}
+      beatsram: ${beatsram:=256Mi}
+      beatsram_limit: ${beatsram_limit:=512Mi}
+      beatscpu: ${beatscpu:=500m}
+      beatscpu_limit: ${beatscpu_limit:=500m}
+      celeryreplicas: ${celeryreplicas:=1}
+      celeryram: ${celeryram:=128Mi}
+      celeryram_limit: ${celeryram_limit:=1024Mi}
+      celerycpu: ${celerycpu:=64m}
+      celerycpu_limit: ${celerycpu_limit:=1000m}
+    substituteFrom:
+      - kind: ConfigMap
+        name: cnpg-bootstrap-${eventname}
+        optional: false
