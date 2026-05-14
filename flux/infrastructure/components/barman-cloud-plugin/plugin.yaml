@@ -7,6 +7,7 @@ metadata:
 spec:
   dependsOn:
     - name: cnpg-helm
+    - name: cert-manager-helm
   interval: 10m
   path: ./flux/infrastructure/components/barman-cloud-plugin/helmrelease
   prune: true
