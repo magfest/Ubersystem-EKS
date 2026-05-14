@@ -1,0 +1,69 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cnpg-backup-validation
+  namespace: ${eventname}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cnpg-backup-validation
+  namespace: ${eventname}
+rules:
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusters", "backups"]
+    verbs: ["get", "list", "create", "patch", "update", "delete"]
+  - apiGroups: ["barmancloud.cnpg.io"]
+    resources: ["objectstores"]
+    verbs: ["get", "list", "create", "patch", "update", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cnpg-backup-validation
+  namespace: ${eventname}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cnpg-backup-validation
+subjects:
+  - kind: ServiceAccount
+    name: cnpg-backup-validation
+    namespace: ${eventname}
+---
+# Cluster-scoped: PVs released by the test cluster need to be cleaned up
+# explicitly because ebs-sc uses reclaimPolicy: Retain.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cnpg-backup-validation-pv
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cnpg-backup-validation-pv-${eventname}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cnpg-backup-validation-pv
+subjects:
+  - kind: ServiceAccount
+    name: cnpg-backup-validation
+    namespace: ${eventname}

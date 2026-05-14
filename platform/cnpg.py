@@ -61,3 +61,11 @@ if not use_rds:
             namespace=namespace,
             service_account="database",
             role_arn=role.arn)
+        # CNPG creates a ServiceAccount named after each cluster. The backup
+        # validation cronjob restores into a cluster named database-backup-test,
+        # which needs the same S3 read access for inheritFromIAMRole to work.
+        aws.eks.PodIdentityAssociation(f"cnpg_backup_test_{namespace}",
+            cluster_name=eks.eks_cluster.name,
+            namespace=namespace,
+            service_account="database-backup-test",
+            role_arn=role.arn)

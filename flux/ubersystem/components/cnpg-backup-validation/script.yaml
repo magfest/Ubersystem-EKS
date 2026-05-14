@@ -1,0 +1,272 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cnpg-backup-validation-script
+  namespace: ${eventname}
+data:
+  validate.sh: |
+    #!/bin/bash
+    set -euo pipefail
+
+    # ---- Inputs (env from CronJob) ----
+    : "$${EVENT:?}"
+    : "$${PROD_CLUSTER:?}"
+    : "$${TEST_CLUSTER:?}"
+    : "$${BUCKET:?}"
+    : "$${READ_GEN:?}"
+    MAX_WAL_AGE="$${MAX_WAL_AGE:-86400}"
+    READY_TIMEOUT="$${READY_TIMEOUT:-1800}"
+    POLL_INTERVAL="$${POLL_INTERVAL:-15}"
+
+    TEST_OBJECTSTORE="$${TEST_CLUSTER}-store"
+
+    log()  { echo "[$(date -u +%FT%TZ)] $*"; }
+    fail() { echo "[$(date -u +%FT%TZ)] FAIL: $*" >&2; exit 1; }
+
+    # Parse an RFC3339 timestamp into epoch seconds. Works with both GNU date
+    # and BusyBox date (which doesn't grok "T...Z" form on its own).
+    ts_to_epoch() {
+      local t="$1"
+      [ -n "$t" ] || { echo 0; return; }
+      date -u -d "$t" +%s 2>/dev/null \
+        || date -u -d "$(echo "$t" | sed -e 's/T/ /' -e 's/Z$//' -e 's/\.[0-9]*//')" +%s 2>/dev/null \
+        || echo 0
+    }
+
+    # ---- Cleanup trap ----
+    cleanup() {
+      log "Cleanup: removing test resources"
+
+      # Record which PVs back the test cluster's PVCs before we delete
+      # anything. PVCs are namespaced and labeled, so this is a server-side
+      # filter on namespace + cnpg.io/cluster label — no full-cluster scan.
+      PV_NAMES=$(kubectl -n "$EVENT" get pvc \
+                   -l "cnpg.io/cluster=$TEST_CLUSTER" \
+                   -o jsonpath='{.items[*].spec.volumeName}' 2>/dev/null || true)
+      [ -n "$PV_NAMES" ] && log "test-cluster PVs: $PV_NAMES"
+
+      kubectl -n "$EVENT" delete cluster.postgresql.cnpg.io "$TEST_CLUSTER" \
+        --ignore-not-found=true --wait=true --timeout=300s || true
+      kubectl -n "$EVENT" delete objectstore.barmancloud.cnpg.io "$TEST_OBJECTSTORE" \
+        --ignore-not-found=true || true
+      kubectl -n "$EVENT" delete pvc -l "cnpg.io/cluster=$TEST_CLUSTER" \
+        --ignore-not-found=true || true
+
+      # Delete the PVs we recorded by exact name (ebs-sc is Retain, so
+      # otherwise they linger and accumulate disk every run).
+      for pv in $PV_NAMES; do
+        [ -n "$pv" ] || continue
+        log "Deleting PV $pv"
+        kubectl patch pv "$pv" --type=json \
+          -p='[{"op":"remove","path":"/spec/claimRef"}]' 2>/dev/null || true
+        kubectl delete pv "$pv" --ignore-not-found=true --wait=false || true
+      done
+
+      # Orphan recovery: a previous run may have died after the PVCs were
+      # gone but before the PVs were. Those PVs sit Released with a
+      # claimRef still pointing at this namespace + a $TEST_CLUSTER-<n>
+      # name. Server-side selectors on PVs only cover status.phase and
+      # metadata.name, so phase=Released is the narrowest filter we can push
+      # down; per-PV we then accept only matching claimRefs.
+      while read -r pv ns name; do
+        [ -n "$pv" ] || continue
+        [ "$ns" = "$EVENT" ] || continue
+        case "$name" in "$TEST_CLUSTER"-*) ;; *) continue ;; esac
+        log "Deleting orphan Released PV $pv (claimRef=$ns/$name)"
+        kubectl patch pv "$pv" --type=json \
+          -p='[{"op":"remove","path":"/spec/claimRef"}]' 2>/dev/null || true
+        kubectl delete pv "$pv" --ignore-not-found=true --wait=false || true
+      done < <(kubectl get pv \
+                 --field-selector status.phase=Released \
+                 -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.claimRef.namespace}{" "}{.spec.claimRef.name}{"\n"}{end}')
+    }
+    trap cleanup EXIT
+
+    # Pre-run cleanup: previous runs may have left resources behind if they
+    # were killed mid-way. cleanup() is idempotent.
+    log "Pre-run cleanup of any stale test resources"
+    cleanup
+
+    # =====================================================================
+    # Phase A — production WAL archiving health
+    #
+    # If WAL archiving to S3 stops working, WAL segments accumulate on the
+    # primary's PVC until the disk fills. Replicas streaming from the primary
+    # also stall once the primary can't release WAL. So checking the cluster's
+    # archive condition + freshness covers the whole replica set.
+    # =====================================================================
+    log "Phase A: checking production cluster $PROD_CLUSTER health"
+    PROD_JSON=$(kubectl -n "$EVENT" get cluster.postgresql.cnpg.io "$PROD_CLUSTER" -o json)
+
+    INSTANCES=$(echo "$PROD_JSON"     | jq -r '.spec.instances')
+    READY=$(echo "$PROD_JSON"         | jq -r '.status.readyInstances // 0')
+    HEALTHY=$(echo "$PROD_JSON"       | jq -r '(.status.instancesStatus.healthy // []) | length')
+    FAILED=$(echo "$PROD_JSON"        | jq -r '(.status.instancesStatus.failed  // []) | join(",")')
+    FENCED=$(echo "$PROD_JSON"        | jq -r '(.status.instancesStatus.fenced  // []) | join(",")')
+    ARCH_COND=$(echo "$PROD_JSON"     | jq -r '.status.conditions[]? | select(.type=="ContinuousArchiving") | .status')
+    ARCH_MSG=$(echo "$PROD_JSON"      | jq -r '.status.conditions[]? | select(.type=="ContinuousArchiving") | .message // ""')
+    LAST_WAL=$(echo "$PROD_JSON"      | jq -r '.status.lastArchivedWAL // ""')
+    LAST_WAL_TIME=$(echo "$PROD_JSON" | jq -r '.status.lastArchivedWALTime // ""')
+    LAST_FAIL_WAL=$(echo "$PROD_JSON" | jq -r '.status.lastFailedArchiveTime // ""')
+
+    log "instances spec=$INSTANCES ready=$READY healthy=$HEALTHY failed=[$FAILED] fenced=[$FENCED]"
+    log "ContinuousArchiving=$ARCH_COND msg='$ARCH_MSG'"
+    log "lastArchivedWAL=$LAST_WAL at $LAST_WAL_TIME (lastFailed=$LAST_FAIL_WAL)"
+
+    [ "$READY"   -eq "$INSTANCES" ] || fail "readyInstances=$READY != spec.instances=$INSTANCES"
+    [ "$HEALTHY" -eq "$INSTANCES" ] || fail "healthy=$HEALTHY != spec.instances=$INSTANCES"
+    [ -z "$FAILED" ] || fail "instances reported failed: $FAILED"
+    [ -z "$FENCED" ] || fail "instances reported fenced: $FENCED"
+    [ "$ARCH_COND" = "True" ] || fail "ContinuousArchiving condition is $ARCH_COND ($ARCH_MSG)"
+    [ -n "$LAST_WAL" ] || fail "cluster has never archived a WAL"
+
+    if [ -n "$LAST_WAL_TIME" ]; then
+      NOW_S=$(date -u +%s)
+      LAST_S=$(ts_to_epoch "$LAST_WAL_TIME")
+      AGE=$((NOW_S - LAST_S))
+      log "lastArchivedWAL age: $${AGE}s (max allowed: $${MAX_WAL_AGE}s)"
+      [ "$AGE" -le "$MAX_WAL_AGE" ] || fail "last archived WAL is $${AGE}s old, exceeds MAX_WAL_AGE=$${MAX_WAL_AGE}s"
+    fi
+
+    if [ -n "$LAST_FAIL_WAL" ] && [ -n "$LAST_WAL_TIME" ]; then
+      FAIL_S=$(ts_to_epoch "$LAST_FAIL_WAL")
+      SUCC_S=$(ts_to_epoch "$LAST_WAL_TIME")
+      [ "$FAIL_S" -le "$SUCC_S" ] || fail "lastFailedArchiveTime ($LAST_FAIL_WAL) is newer than lastArchivedWALTime ($LAST_WAL_TIME)"
+    fi
+
+    log "Phase A passed"
+
+    # =====================================================================
+    # Phase B — recover into a temporary cluster
+    # Build a fresh CNPG cluster from the read-only ObjectStore. No archiver
+    # plugin is attached, so the recovered DB never writes to S3, and no
+    # application is ever pointed at it — eliminating the risk of stale-data
+    # webhooks, emails, celery jobs, etc.
+    # =====================================================================
+    log "Phase B: creating recovery ObjectStore $TEST_OBJECTSTORE"
+    cat <<EOF | kubectl apply -f -
+    apiVersion: barmancloud.cnpg.io/v1
+    kind: ObjectStore
+    metadata:
+      name: $TEST_OBJECTSTORE
+      namespace: $EVENT
+    spec:
+      configuration:
+        destinationPath: "s3://$BUCKET/$${EVENT}$${READ_GEN}"
+        s3Credentials:
+          inheritFromIAMRole: true
+        wal:
+          maxParallel: 8
+    EOF
+
+    log "Creating recovery cluster $TEST_CLUSTER"
+    cat <<EOF | kubectl apply -f -
+    apiVersion: postgresql.cnpg.io/v1
+    kind: Cluster
+    metadata:
+      name: $TEST_CLUSTER
+      namespace: $EVENT
+      labels:
+        backup-validation: "true"
+    spec:
+      description: "Ephemeral cluster — restored from $PROD_CLUSTER backups for validation"
+      instances: 1
+      imageCatalogRef:
+        apiGroup: postgresql.cnpg.io
+        kind: ClusterImageCatalog
+        name: postgresql
+        major: 17
+      storage:
+        size: 10Gi
+        storageClass: ebs-sc
+      bootstrap:
+        recovery:
+          source: source-cluster
+          recoveryTarget:
+            targetTLI: latest
+      externalClusters:
+        - name: source-cluster
+          plugin:
+            name: barman-cloud.cloudnative-pg.io
+            parameters:
+              barmanObjectName: $TEST_OBJECTSTORE
+    EOF
+
+    log "Waiting for $TEST_CLUSTER to become ready (timeout $${READY_TIMEOUT}s)"
+    deadline=$(( $(date +%s) + READY_TIMEOUT ))
+    while :; do
+      PHASE=$(kubectl -n "$EVENT" get cluster.postgresql.cnpg.io "$TEST_CLUSTER" \
+                -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
+      READY_T=$(kubectl -n "$EVENT" get cluster.postgresql.cnpg.io "$TEST_CLUSTER" \
+                -o jsonpath='{.status.readyInstances}' 2>/dev/null || echo "0")
+      log "  test cluster phase='$PHASE' ready=$READY_T"
+      if [ "$PHASE" = "Cluster in healthy state" ] && [ "$READY_T" = "1" ]; then
+        break
+      fi
+      if [ "$(date +%s)" -ge "$deadline" ]; then
+        kubectl -n "$EVENT" describe cluster.postgresql.cnpg.io "$TEST_CLUSTER" || true
+        fail "test cluster did not become ready within $${READY_TIMEOUT}s"
+      fi
+      sleep "$POLL_INTERVAL"
+    done
+
+    log "Phase B passed"
+
+    # =====================================================================
+    # Phase C — cross-check most recent attendee
+    #
+    # Pull the freshest attendee out of the recovered DB, then verify the
+    # same record (by id) exists verbatim in prod. We don't require both
+    # sides to have the SAME most-recent row — prod will have newer rows
+    # written after the latest archived WAL — but the recovered row must
+    # round-trip cleanly through prod.
+    # =====================================================================
+    log "Phase C: comparing recovered DB to production"
+
+    pod_in() {
+      local cluster="$1"
+      kubectl -n "$EVENT" get pod \
+        -l "cnpg.io/cluster=$cluster,cnpg.io/instanceRole=primary" \
+        -o jsonpath='{.items[0].metadata.name}'
+    }
+
+    TEST_POD=$(pod_in "$TEST_CLUSTER")
+    PROD_POD=$(pod_in "$PROD_CLUSTER")
+    [ -n "$TEST_POD" ] || fail "couldn't find primary pod for $TEST_CLUSTER"
+    [ -n "$PROD_POD" ] || fail "couldn't find primary pod for $PROD_CLUSTER"
+    log "test primary=$TEST_POD prod primary=$PROD_POD"
+
+    # Pipe-separated, headerless single row so parsing is trivial.
+    SELECT_LATEST="SELECT id::text, first_name, last_name, email, registered::text FROM attendee ORDER BY registered DESC NULLS LAST LIMIT 1"
+
+    RECOVERED=$(kubectl -n "$EVENT" exec "$TEST_POD" -c postgres -- \
+      psql -U postgres -d app -A -t -F '|' -c "$SELECT_LATEST") \
+      || fail "psql against recovered cluster failed"
+
+    [ -n "$RECOVERED" ] || fail "recovered DB returned no attendees"
+    log "recovered: $RECOVERED"
+
+    REC_ID=$(echo "$RECOVERED" | awk -F'|' '{print $1}')
+    [ -n "$REC_ID" ] || fail "recovered attendee row has no id"
+
+    # Basic id sanity check before interpolating into SQL on the prod side.
+    # Ubersystem attendee ids are UUIDs — reject anything that isn't.
+    if ! echo "$REC_ID" | grep -Eq '^[0-9a-fA-F-]{8,40}$'; then
+      fail "recovered id '$REC_ID' is not a UUID-shaped value; aborting"
+    fi
+
+    SELECT_BY_ID="SELECT id::text, first_name, last_name, email, registered::text FROM attendee WHERE id = '$REC_ID'"
+    PROD=$(kubectl -n "$EVENT" exec "$PROD_POD" -c postgres -- \
+      psql -U postgres -d app -A -t -F '|' -c "$SELECT_BY_ID") \
+      || fail "psql against production cluster failed"
+
+    [ -n "$PROD" ] || fail "prod has no attendee with id=$REC_ID — recovered row is not in prod"
+    log "prod:      $PROD"
+
+    if [ "$RECOVERED" != "$PROD" ]; then
+      fail "recovered row does not match prod row for id=$REC_ID"
+    fi
+
+    log "Phase C passed: recovered attendee id=$REC_ID round-trips with prod"
+    log "ALL CHECKS PASSED for $EVENT"
