@@ -52,8 +52,7 @@ spec:
     size: ${cnpg_db_size:=10Gi}
     storageClass: ebs-sc
 
-  bootstrap:
-    ${bootstrap_block}
+  bootstrap: ${bootstrap_block}
 
   externalClusters:
     - name: primary-cluster-backup

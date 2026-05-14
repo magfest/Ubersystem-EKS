@@ -21,18 +21,13 @@ data:
     echo "Selected bootstrap mode: $$MODE (event=$$EVENT, prefix=$$PREFIX)"
     kubectl -n "$$EVENT" create configmap cnpg-bootstrap \
       --from-literal=mode="$$MODE" \
-      --from-file=bootstrap_block=/scripts/$${MODE}.yaml \
+      --from-file=bootstrap_block=/scripts/$${MODE}.json \
       --dry-run=client -o yaml | kubectl -n "$$EVENT" apply -f -
     kubectl -n flux-system create configmap "cnpg-bootstrap-$${EVENT}" \
       --from-literal=mode="$$MODE" \
-      --from-file=bootstrap_block=/scripts/$${MODE}.yaml \
+      --from-file=bootstrap_block=/scripts/$${MODE}.json \
       --dry-run=client -o yaml | kubectl -n flux-system apply -f -
-  initdb.yaml: |
-    initdb:
-          database: app
-          owner: app
-  recovery.yaml: |
-    recovery:
-          source: primary-cluster-backup
-          recoveryTarget:
-            targetTLI: "latest"
+  initdb.json: |
+    {"initdb": {"database": "app", "owner": "app"}}
+  recovery.json: |
+    {"recovery": {"source": "primary-cluster-backup", "recoveryTarget": {"targetTLI": "latest"}}}
