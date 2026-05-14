@@ -39,6 +39,10 @@ spec:
                 - key: known_hosts
                   path: known_hosts
       terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: wait-for-db
+        image: busybox:stable
+        command: ["sh", "-c", "until nc -z postgres-pool 5432; do echo waiting for postgres-pool; sleep 2; done"]
       containers:
       - name: web
         image: "${container}"
@@ -135,6 +139,10 @@ spec:
                 - key: known_hosts
                   path: known_hosts
       terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: wait-for-db
+        image: busybox:stable
+        command: ["sh", "-c", "until nc -z postgres-pool 5432; do echo waiting for postgres-pool; sleep 2; done"]
       containers:
       - name: celery-beats
         image: "${container}"
@@ -213,6 +221,10 @@ spec:
                 - key: known_hosts
                   path: known_hosts
       terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: wait-for-db
+        image: busybox:stable
+        command: ["sh", "-c", "until nc -z postgres-pool 5432; do echo waiting for postgres-pool; sleep 2; done"]
       containers:
       - name: celery-worker
         image: "${container}"
@@ -265,6 +277,10 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+      - name: wait-for-web
+        image: quay.io/curl/curl:latest
+        command: ["sh", "-c", "until curl -sf http://web/devtools/health; do echo waiting for web; sleep 2; done"]
       containers:
       - name: create-admin
         image: quay.io/curl/curl:latest
