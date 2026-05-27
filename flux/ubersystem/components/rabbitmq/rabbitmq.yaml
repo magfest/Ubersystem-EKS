@@ -35,7 +35,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: rabbitmq
-        image: "rabbitmq:alpine"
+        image: "rabbitmq:4.2-alpine"
         ports:
         - containerPort: 5672
         env:
