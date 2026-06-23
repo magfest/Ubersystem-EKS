@@ -3,6 +3,7 @@ import pulumi
 import pulumi_aws as aws
 
 import eks
+import events_loader
 
 config = pulumi.Config()
 
@@ -55,7 +56,7 @@ if not use_rds:
         policy_arn=policy.arn,
         role=role.name)
 
-    for namespace in config.require_object("uber_instances"):
+    for namespace in events_loader.load_namespaces():
         aws.eks.PodIdentityAssociation(f"cnpg_backups_{namespace}",
             cluster_name=eks.eks_cluster.name,
             namespace=namespace,
