@@ -2,6 +2,48 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 
 patches:
+# The base wait-for-db init container polls the CNPG pooler service
+# (postgres-pool), which doesn't exist when the database lives in RDS. Point it
+# at the RDS endpoint from ${rds_secret} instead, or pods hang in Init forever.
+# Assumes wait-for-db is the first init container, as it is in ubersystem.yaml.
+- patch: &wait_patch |-
+    - op: replace
+      path: /spec/template/spec/initContainers/0
+      value:
+        name: wait-for-db
+        image: busybox:stable
+        env:
+        - name: DB_HOSTNAME
+          valueFrom:
+            secretKeyRef:
+              name: ${rds_secret}
+              key: hostname
+        command:
+        - sh
+        - -c
+        - |
+          if [ -z "$DB_HOSTNAME" ]; then
+            echo "DB_HOSTNAME is empty; check the ${rds_secret} secret"
+            exit 1
+          fi
+          until nc -z "$DB_HOSTNAME" 5432; do
+            echo "waiting for $DB_HOSTNAME"
+            sleep 2
+          done
+  target:
+    kind: Deployment
+    name: web
+
+- patch: *wait_patch
+  target:
+    kind: Deployment
+    name: celery-beats
+
+- patch: *wait_patch
+  target:
+    kind: Deployment
+    name: celery-worker
+
 - patch: &env_patch |-
     - op: add
       path: /spec/template/spec/containers/0/env/-
