@@ -1,16 +1,23 @@
 ---
-# Requires the elbv2.k8s.aws CRDs installed by the aws-load-balancer-controller
-# HelmRelease in ./components/alb-controller. Keep this in a Kustomization that
-# dependsOn the one carrying that component, or the server-side dry-run fails
-# with `no matches for kind "TargetGroupBinding"` and nothing gets applied.
-apiVersion: elbv2.k8s.aws/v1beta1
-kind: TargetGroupBinding
+# TargetGroupBinding is an elbv2.k8s.aws CRD published by the
+# aws-load-balancer-controller HelmRelease. Applying it in the same
+# Kustomization as that HelmRelease deadlocks on first install: the server-side
+# dry-run fails with `no matches for kind "TargetGroupBinding"` and aborts the
+# whole apply, including the HelmRelease that would create the CRD.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
 metadata:
-  name: ingress-nginx-tgb
-  namespace: ingress-nginx
+  name: target-group-binding
+  namespace: flux-system
 spec:
-  serviceRef:
-    name: ingress-nginx-controller
-    port: 80
-  targetGroupARN: ${targetgroup_arn}
-  targetType: ip
+  dependsOn:
+    - name: alb-controller-helm
+  interval: 10m
+  path: ./flux/infrastructure/components/target-group-binding/binding
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: ubersystem-eks
+  postBuild:
+    substitute:
+      targetgroup_arn: ${targetgroup_arn}

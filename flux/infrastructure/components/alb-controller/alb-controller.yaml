@@ -8,25 +8,24 @@ spec:
   interval: 12h
   url: https://aws.github.io/eks-charts
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+# The HelmRelease lives in its own Kustomization so that resources depending on
+# the elbv2.k8s.aws CRDs it installs (see ../target-group-binding) can order
+# themselves behind it with dependsOn. Substitutions are passed through from the
+# parent Kustomization's postBuild.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
 metadata:
-  name: aws-load-balancer-controller
-  namespace: kube-system
+  name: alb-controller-helm
+  namespace: flux-system
 spec:
-  interval: 30m
-  chart:
-    spec:
-      chart: aws-load-balancer-controller
-      version: "3.1.0"
-      sourceRef:
-        kind: HelmRepository
-        name: eks-charts
-        namespace: kube-system
-  values:
-    clusterName: "${clustername}"
-    vpcId: "${vpcId}"
-    region: "${region}"
-    serviceAccount:
-      create: true
-      name: aws-load-balancer-controller
+  interval: 10m
+  path: ./flux/infrastructure/components/alb-controller/helmrelease
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: ubersystem-eks
+  postBuild:
+    substitute:
+      clustername: ${clustername}
+      vpcId: ${vpcId}
+      region: ${region}
