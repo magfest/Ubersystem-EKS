@@ -75,7 +75,14 @@ aws.eks.Addon("vpc-cni",
     }],
     configuration_values=json.dumps({
         "env": {
-        "ENABLE_PREFIX_DELEGATION": "true"
+            "ENABLE_PREFIX_DELEGATION": "true",
+            # Allocate prefixes on demand instead of holding a full spare /28
+            # per node (the WARM_PREFIX_TARGET=1 default). Necessary where the
+            # node subnet is small enough that warm prefixes exhaust the
+            # available aligned /28 blocks before pods actually need the IPs.
+            "WARM_IP_TARGET": "2",
+            "MINIMUM_IP_TARGET": "1",
+            "WARM_ENI_TARGET": "0",
         }
     }),
     opts = pulumi.ResourceOptions(depends_on=[eks.eks_cluster], replace_with=[eks.eks_cluster]))
