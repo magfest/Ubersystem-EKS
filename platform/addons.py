@@ -5,6 +5,8 @@ import pulumi_aws as aws
 import eks
 import nodegroup
 
+config = pulumi.Config()   
+
 eks_pod_identity_agent = aws.eks.Addon("eks-pod-identity-agent",
     cluster_name=eks.eks_cluster.name,
     addon_name="eks-pod-identity-agent",
@@ -75,7 +77,7 @@ aws.eks.Addon("vpc-cni",
     }],
     configuration_values=json.dumps({
         "env": {
-            "ENABLE_PREFIX_DELEGATION": "true",
+            "ENABLE_PREFIX_DELEGATION": "true" if config.get_bool("enable_prefix_delegation", True) else "false",
             # Allocate prefixes on demand instead of holding a full spare /28
             # per node (the WARM_PREFIX_TARGET=1 default). Necessary where the
             # node subnet is small enough that warm prefixes exhaust the
