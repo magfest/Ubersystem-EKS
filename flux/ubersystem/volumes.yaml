@@ -33,6 +33,4 @@ spec:
     storage: ${upload_storage_size:=20Gi}
   csi:
     driver: efs.csi.aws.com
-    volumeAttributes:
-      path: /
     volumeHandle: ${efs_filesystem}
