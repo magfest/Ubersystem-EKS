@@ -1,0 +1,16 @@
+---
+# Requires the elbv2.k8s.aws CRDs installed by the aws-load-balancer-controller
+# HelmRelease in ./components/alb-controller. Keep this in a Kustomization that
+# dependsOn the one carrying that component, or the server-side dry-run fails
+# with `no matches for kind "TargetGroupBinding"` and nothing gets applied.
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: ingress-nginx-tgb
+  namespace: ingress-nginx
+spec:
+  serviceRef:
+    name: ingress-nginx-controller
+    port: 80
+  targetGroupARN: ${targetgroup_arn}
+  targetType: ip

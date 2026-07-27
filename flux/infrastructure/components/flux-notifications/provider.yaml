@@ -1,0 +1,13 @@
+---
+# Slack delivery for Flux events. The operator pre-creates a Secret named
+# `flux-slack-webhook` in flux-system with a single key `address` holding
+# the incoming-webhook URL; this Provider just references it.
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: slack
+  namespace: flux-system
+spec:
+  type: slack
+  secretRef:
+    name: flux-slack-webhook

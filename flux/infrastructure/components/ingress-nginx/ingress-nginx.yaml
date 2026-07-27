@@ -41,16 +41,3 @@ spec:
           http: http
       admissionWebhooks:
         enabled: false
----
-apiVersion: elbv2.k8s.aws/v1beta1
-kind: TargetGroupBinding
-metadata:
-  name: ingress-nginx-tgb
-  namespace: ingress-nginx
-spec:
-  serviceRef:
-    name: ingress-nginx-controller 
-    port: 80
-  
-  targetGroupARN: ${targetgroup_arn}
-  targetType: ip

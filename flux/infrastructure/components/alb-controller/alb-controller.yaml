@@ -27,7 +27,6 @@ spec:
     clusterName: "${clustername}"
     vpcId: "${vpcId}"
     region: "${region}"
-    
     serviceAccount:
       create: true
       name: aws-load-balancer-controller
