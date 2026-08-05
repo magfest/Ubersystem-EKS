@@ -75,8 +75,11 @@ eks_cluster = aws.eks.Cluster("Ubersystem",
     },
     opts = pulumi.ResourceOptions(
         depends_on=[cluster_amazon_eks_cluster_policy],
-        replace_on_changes=["vpcId", "subnetIds", "vpcConfig"],
-        delete_before_replace=True,
+        # Never let a plan delete the cluster implicitly. EKS supports
+        # in-place updates of subnets/SGs/endpoint access, and provider
+        # upgrades can produce phantom vpcConfig diffs; if a replacement
+        # is ever genuinely required, unprotect explicitly first.
+        protect=True,
     ))
 
 for cluster_admin in config.require_object("cluster_admins"):
