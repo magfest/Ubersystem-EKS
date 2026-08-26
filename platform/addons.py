@@ -131,3 +131,8 @@ pod_identity_association = aws.eks.PodIdentityAssociation(
     service_account="aws-load-balancer-controller",
     role_arn=alb_controller_role.arn,
 )
+
+secrets_store_csi_driver = aws.eks.Addon("aws-secrets-store-csi-driver-provider",
+    cluster_name=eks.eks_cluster.name,
+    addon_name="aws-secrets-store-csi-driver-provider",
+    opts = pulumi.ResourceOptions(depends_on=[eks.eks_cluster], replace_with=[eks.eks_cluster]))

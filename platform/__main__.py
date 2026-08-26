@@ -8,6 +8,16 @@ import cnpg
 import ubersystem
 import cloudfront
 
+# Allows site-specific modules to be loaded if present
+import glob
+import importlib
+import os
+
+for _site in sorted(glob.glob(os.path.join(os.path.dirname(__file__), "site_*.py"))):
+    _name = os.path.basename(_site)[:-3]
+    print(f"loading site module {_name}")
+    importlib.import_module(_name)
+
 import pulumi
 def alias_old_project_name(args):
     """
