@@ -34,6 +34,10 @@ spec:
   values:
     controller:
       replicaCount: 3
+      config:
+        use-forwarded-headers: "true"
+        compute-full-forwarded-for: "true"
+        proxy-real-ip-cidr: "${ingress_real_ip_cidr:=0.0.0.0/0}"
       service:
         type: ClusterIP
         enableHttps: false
