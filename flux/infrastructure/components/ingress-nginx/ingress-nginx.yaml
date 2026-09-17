@@ -39,8 +39,10 @@ spec:
         compute-full-forwarded-for: "true"
         proxy-real-ip-cidr: "${ingress_real_ip_cidr:=0.0.0.0/0}"
         location-snippet: |
-          more_set_input_headers "X-Forwarded-Proto: https";
-          more_set_input_headers "X-Forwarded-Port: 443";
+          access_by_lua_block {
+            ngx.var.pass_access_scheme = "https"
+            ngx.var.pass_port = 443
+          }
       service:
         type: ClusterIP
         enableHttps: false
