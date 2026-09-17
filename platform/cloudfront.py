@@ -88,6 +88,7 @@ if not disable_cloudfront:
         origins=[{
             "domain_name": nginx_nlb.dns_name,
             "origin_id": config.require("cluster_name"),
+            "connection_attempts": 1,
             "vpc_origin_config": {
                 "vpc_origin_id": vpc_origin.id, 
             }
