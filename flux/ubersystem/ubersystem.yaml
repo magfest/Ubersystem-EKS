@@ -48,7 +48,7 @@ spec:
         image: "${container}"
         imagePullPolicy: Always
         livenessProbe:
-          timeoutSeconds: 10
+          timeoutSeconds: 60
           periodSeconds: 60
           httpGet:
             path: /landing/

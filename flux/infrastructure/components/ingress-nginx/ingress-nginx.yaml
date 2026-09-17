@@ -34,6 +34,11 @@ spec:
   values:
     controller:
       replicaCount: 3
+      # Serves the nginx_ingress_controller_* families on 10254 (--enable-metrics
+      # defaults to false), which ops/launch_console scrapes for connection states
+      # and accepted-vs-handled. Toggling this rolls the controller pods.
+      metrics:
+        enabled: true
       config:
         use-forwarded-headers: "true"
         compute-full-forwarded-for: "true"
