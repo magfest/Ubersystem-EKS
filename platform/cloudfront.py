@@ -128,6 +128,24 @@ if not disable_cloudfront:
                         "forward": "none"
                     }
                 }
+            },
+            {
+                "path_pattern": "/favicon.ico",
+                "allowed_methods": ["GET", "HEAD", "OPTIONS"],
+                "cached_methods": ["GET", "HEAD", "OPTIONS"],
+                "target_origin_id": config.require("cluster_name"),
+                "min_ttl": 0,
+                "default_ttl": 86400,
+                "max_ttl": 604800,
+                "compress": True,
+                "viewer_protocol_policy": "redirect-to-https",
+                "forwarded_values": {
+                    "query_string": False,
+                    "headers": ["Host"],
+                    "cookies": {
+                        "forward": "none"
+                    }
+                }
             }
         ],
         price_class="PriceClass_100",
