@@ -1,0 +1,12 @@
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+spec:
+  serviceRef:
+    name: envoy-gateway-public
+    port: 80
+  targetGroupARN: ${gateway_targetgroup_arn}
+  targetType: ip

@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: envoy-gateway-system
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+spec:
+  type: oci
+  interval: 24h
+  url: oci://docker.io/envoyproxy
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: envoy-gateway-helm
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./flux/infrastructure/components/envoy-gateway/helmrelease
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: ubersystem-eks
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: envoy-gateway
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: envoy-gateway-helm
+    - name: alb-controller-helm
+  interval: 10m
+  path: ./flux/infrastructure/components/envoy-gateway/gateway
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: ubersystem-eks
+  postBuild:
+    substitute:
+      gateway_targetgroup_arn: ${gateway_targetgroup_arn}
+      ingress_real_ip_cidr: "${ingress_real_ip_cidr:=0.0.0.0/0}"

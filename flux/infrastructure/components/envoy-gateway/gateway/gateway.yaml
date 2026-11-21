@@ -1,0 +1,88 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: public
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      useListenerPortAsContainerPort: true
+      envoyDeployment:
+        replicas: 3
+      envoyPDB:
+        maxUnavailable: 1
+      envoyService:
+        name: envoy-gateway-public
+        type: ClusterIP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: public
+    namespace: envoy-gateway-system
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: envoy-gateway
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: public
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
+  healthCheck:
+    path: /healthz
+  clientIPDetection:
+    xForwardedFor:
+      trustedCIDRs:
+        - ${ingress_real_ip_cidr}
+  headers:
+    earlyRequestHeaders:
+      set:
+        - name: X-Forwarded-Proto
+          value: https
+        - name: X-Forwarded-Port
+          value: "443"
+        - name: X-Forwarded-Host
+          value: "%REQ(:AUTHORITY)%"
+        - name: X-Request-Start
+          value: "t=%START_TIME(%s.%3f)%"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: public
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public
+  timeout:
+    http:
+      requestTimeout: 0s
+      streamIdleTimeout: 300s
