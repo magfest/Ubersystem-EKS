@@ -9,7 +9,7 @@ spec:
   url: https://aws.github.io/eks-charts
 ---
 # The HelmRelease lives in its own Kustomization so that resources depending on
-# the elbv2.k8s.aws CRDs it installs (see ../target-group-binding) can order
+# the elbv2.k8s.aws CRDs it installs (see ../envoy-gateway) can order
 # themselves behind it with dependsOn. Substitutions are passed through from the
 # parent Kustomization's postBuild.
 apiVersion: kustomize.toolkit.fluxcd.io/v1

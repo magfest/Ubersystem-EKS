@@ -18,27 +18,3 @@ spec:
       name: web
   selector:
     app: web
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: web
-  namespace: ${eventname}
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 100m
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
-spec:
-  rules:
-  - host: ${hostname}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web
-            port:
-              number: 80
-  ingressClassName: nginx

@@ -33,23 +33,6 @@ nlb_sg = aws.ec2.SecurityGroup("nginx-nlb-sg",
     }]
 )
 
-nginx_tg = aws.lb.TargetGroup("nginx-internal-tg",
-    name="Ubersystem-http",
-    port=80,
-    protocol="HTTP",
-    vpc_id=vpc.vpc_id,
-    target_type="ip", 
-    health_check={
-        "protocol": "HTTP",
-        "port": "10254", 
-        "path": "/healthz",
-        "healthy_threshold": 2,
-        "unhealthy_threshold": 2,
-        "timeout": 3,
-        "interval": 10,
-    }
-)
-
 nginx_nlb = aws.lb.LoadBalancer("nginx-internal-nlb",
     name="Ubersystem",
     internal=True,
@@ -77,18 +60,13 @@ gateway_tg = aws.lb.TargetGroup("gateway-internal-tg",
 )
 pulumi.export("gateway_targetgroup_arn", gateway_tg.arn)
 
-# TODO: Remove once migration to envoy is complete
-ingress_backend = config.get("ingress_backend") or "nginx"
-if ingress_backend not in ("nginx", "gateway"):
-    raise ValueError(f"ingress_backend must be 'nginx' or 'gateway', not {ingress_backend!r}")
-
 nginx_listener = aws.lb.Listener("nginx-listener",
     load_balancer_arn=nginx_nlb.arn,
     port=80,
     protocol="HTTP",
     default_actions=[{
         "type": "forward",
-        "target_group_arn": gateway_tg.arn if ingress_backend == "gateway" else nginx_tg.arn
+        "target_group_arn": gateway_tg.arn
     }]
 )
 
